@@ -1,0 +1,6 @@
+build/*
+problem-*
+!*.cpp
+!*.h
+temp*
+.vscode/*
