@@ -10,10 +10,10 @@ namespace litindex
    public:
       BookIndex() = default;
       BookIndex(int c, int s, int p);  
-      ~BookIndex()
-      {
-         std::cout << "Deallocating.\n";
-      }
+      // ~BookIndex()
+      // {
+      //    std::cout << "Deallocating.\n";
+      // }
       
       int get_chapter() const { return this->chapter; }
       int get_section() const { return this->section; }

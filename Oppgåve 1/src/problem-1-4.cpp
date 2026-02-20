@@ -2,6 +2,7 @@
 #include "book-index.h"
 
 
+
 void start_chapter(litindex::BookIndex b)
 {
     std::cout << "start_chapter(litindex::BookIndex b)\n";
