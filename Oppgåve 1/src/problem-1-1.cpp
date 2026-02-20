@@ -3,6 +3,7 @@
 
 int main(int /*argc*/, char** /*argv*/) 
 {
+    /* Skriver ut sizeof de ulike datatypene*/
     short a;
     std::cout << "The sizeof a short is " << sizeof(a) << "\n";
     int b;
@@ -20,9 +21,11 @@ int main(int /*argc*/, char** /*argv*/)
     double h;
     std::cout << "The sizeof a double is " << sizeof(h) << "\n";
 
-
+    // Lager en peker til adressen til b
     int* ptr_b = &b;
 
+    // adressen til b og &b+1
+    // for å sbrive ut differansen i antall byte og ikke antall int konverterer vi til uint8_t
     std::cout << "\n";
     std::cout << "minneadressen til en tillfeldig int er " << ptr_b << "\n" 
         << "minneadressen med incrementering er " << ptr_b + 1 << "\n"

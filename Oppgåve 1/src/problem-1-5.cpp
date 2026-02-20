@@ -11,9 +11,11 @@ int main(int argc, char** argv)
     std::vector<std::string> args;
     std::unordered_set<std::string> seen;
 
+    // Går gjennom alle argumentene
     for (int i = 0; i < argc; i++) {
         std::string arg = argv[i];
 
+        // hvis argumentet starter med "-" og er unikt lagres verdien etter også
         if (arg[0] == '-') {
             if (seen.insert(arg).second) {
                 args.push_back(arg);

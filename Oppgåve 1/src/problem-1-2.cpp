@@ -31,6 +31,8 @@ int main(int /*argc*/, char** /*argv*/)
 
 void print_hex(unsigned char* char_ptr, size_t array_size)
 {
+    //Gå gjennom minnet en byte av gangen
+    //Skrive ut hver byte i hex
     std::cout << std::hex << std::uppercase << "0x" ;
     for (size_t i = 0; i < array_size; i++)
     {

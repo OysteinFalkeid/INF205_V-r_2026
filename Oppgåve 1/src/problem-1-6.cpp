@@ -47,20 +47,22 @@ namespace
 
 int main()
 {
-    char c_style_str[] = "INF205";
-    increment_at_position(5, c_style_str);
-    std::cout << "\tc_style_str after the function: \"" << c_style_str << "\"\n\n";
-    
-    std::string cpp_style_str = "INF205";
-    increment_at_position(5, cpp_style_str);
-    std::cout << "\tcpp_style_str after the function: \"" << cpp_style_str << "\"\n\n";
+   // original eksempel kode
+   char c_style_str[] = "INF205";
+   increment_at_position(5, c_style_str);
+   std::cout << "\tc_style_str after the function: \"" << c_style_str << "\"\n\n";
+   
+   std::string cpp_style_str = "INF205";
+   increment_at_position(5, cpp_style_str);
+   std::cout << "\tcpp_style_str after the function: \"" << cpp_style_str << "\"\n\n";
 
-    std::array<char, 7> cpp_style_array{'I', 'N', 'F', '2', '0', '5'};
-    increment_at_position(5, cpp_style_array);
-    std::cout << "\tcpp_style_array after the function: \"" << cpp_style_array.data() << "\"\n\n";
-    
-    // std::array<char, 7> cpp_style_array{'I', 'N', 'F', '2', '0', '5'};
-    increment_at_position(5, &cpp_style_array);
-    std::cout << "\tcpp_style_array after the function: \"" << cpp_style_array.data() << "\"\n\n";
+   //std array type
+   std::array<char, 7> cpp_style_array{'I', 'N', 'F', '2', '0', '5'};
+
+   increment_at_position(5, cpp_style_array);
+   std::cout << "\tcpp_style_array after the function: \"" << cpp_style_array.data() << "\"\n\n";
+   
+   increment_at_position(5, &cpp_style_array);
+   std::cout << "\tcpp_style_array after the function: \"" << cpp_style_array.data() << "\"\n\n";
 
 }

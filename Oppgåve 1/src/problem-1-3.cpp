@@ -12,11 +12,13 @@ int main()
 
    std::clog << "\nWriting jai_i into a string stream.\n";
    std::ofstream of_file("temp.txt");
+   //Sjekker om filen ble åpnet riktig:
    if (!of_file) {
       return 1;
    }
 
    std::ifstream if_file("temp.txt");
+   //Sjekker om filen ble åpnet riktig:
    if (!if_file) {
       return 1;
    }
