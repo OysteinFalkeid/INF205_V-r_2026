@@ -16,7 +16,7 @@ int main(int argc, char** argv)
    {
       std::string arg = argv[i]; // gjør om til std::string
 
-      if (sett.insert(arg).second)  // true hvis ikke sett før
+      if (sett.insert(arg).second)  // true hvis ikke sett før. legge til
       {
          rekkefolge.push_back(arg);
       }
