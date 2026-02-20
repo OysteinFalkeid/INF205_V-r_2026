@@ -18,7 +18,7 @@ namespace
    {
       std::cout << "increment_value:\n";
       arr[p]++;
-      std::cout << "Inside by_value: " << arr.data() << "\"\n";
+      std::cout << "Inside by_value: " << arr.data() << "\n";
    }
 
    // Send ved referanse. Samme objekt brukes. Originalen endres
@@ -26,7 +26,7 @@ namespace
    {
       std::cout << "increment_reference: \n";
       arr[p]++;   
-      std::cout << "Inside by_reference: " << arr.data() << "\"\n";
+      std::cout << "Inside by_reference: " << arr.data() << "\n";
    }
 }
 
