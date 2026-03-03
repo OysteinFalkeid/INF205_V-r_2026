@@ -5,7 +5,7 @@ export PATH=".:$PATH"
 echo "-----------------------------------------------------------------"
 echo "problem-2-1"
 echo ""
-problem-2-1
+valgrind --leak-check=full --show-leak-kinds=all ./problem-2-1 
 echo "-----------------------------------------------------------------"
 echo "problem-2-2"
 echo ""
