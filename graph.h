@@ -1,16 +1,16 @@
-#ifndef GRAPH_H
-#define GRAPH_H
-
 #include <string>
 #include <vector>
+#include <list>
 #include <ostream>
 #include <istream>
 
-class Edge;  
+class Edge;   // forward declaration av Edge. Edge finnes, men kommer etter Node. Node bruker edge
 
 class AbstractGraph {
 public:
-    virtual ~AbstractGraph() {}   // viktig!
+    virtual ~AbstractGraph() {}   // virtuell destruktør
+
+    //Rene virtuelle funksjoner som gjør klassen abstrakt
 
     virtual void insert_edge(
         std::string node_a_label,
@@ -27,31 +27,47 @@ public:
 
 class Node {
 public:
+
+    //unike identifikatoren til noden
     std::string label;
+    //alle edges denne noden er incident til
     std::vector<Edge*> incidences;
 
+    //Konstruktøren 
     Node(const std::string& l);
 };
 
 class Edge {
 public:
+
+    //Navnet på edgen
     std::string label;
+
+    //Peker til opprinnelsesnoden
     Node* from;
+    //Peker til endenoden?
     Node* to;
 
+    //Konstruktøren
     Edge(const std::string& l, Node* f, Node* t);
 };
 
 class Graph : public AbstractGraph {
 private:
+    //Liste over alle noder i grafen
     std::vector<Node*> nodes;
+    //Liste over alle edges i grafen
     std::vector<Edge*> edges;
 
+    //Hjelpefunksjon som skal søke gjennom nodes vektoren etter en node med bestemt navn ´label´
     Node* find_node(const std::string& label);
 
 public:
+
+    //Destruktøren
     ~Graph();
 
+    //Tømmer grafen
     void clear() override;
     
     /* oppgave 2
@@ -59,6 +75,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Graph& g);
     */
 
+    //Lgger til kant i grafen og oppretter noder hvis de ikke eksisterer fra før av
     void insert_edge(std::string node_a_label,
                      std::string edge_label,
                      std::string node_b_label) override;
@@ -68,4 +85,26 @@ public:
     
 };
 
-#endif
+class MatrixGraph : public AbstractGraph{
+    private:
+        //Hva noden kallen
+        std::vector<std::string> nodes;
+        //Matrise matrix[i][j] alle edges fra node i til node j
+        std::vector<std::vector<std::list<std::string>>> matrix;
+
+        //Søker gjennom nodes vektoren etter en node med et bestemt navn og returnerer indeksen:
+        int find_node(const std::string& label) const;
+
+        //Legger til ny node og utvider matrisen. nå skal vi endre på matrisen og derfor er det ik const på slutten:
+        void add_node(const std::string& label);
+    public:
+        ~MatrixGraph();
+
+        void clear() override;
+        void insert_edge(std::string node_a_label,
+                     std::string edge_label,
+                     std::string node_b_label) override;
+        void read(std::istream& is) override;
+        void write(std::ostream& os) const override;
+
+};
