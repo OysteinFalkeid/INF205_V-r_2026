@@ -2,21 +2,17 @@
 #include <ostream>
 #include <iostream>
 
-// ----- Node -----
 
 Node::Node(const std::string& l)
     : label(l)
 {
 }
 
-// ----- Edge -----
-
 Edge::Edge(const std::string& l, Node* f, Node* t)
     : label(l), from(f), to(t)
 {
 }
 
-// ----- Graph -----
 
 Node* Graph::find_node(const std::string& label)
 {
