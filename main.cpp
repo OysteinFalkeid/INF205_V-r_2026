@@ -27,7 +27,6 @@ int main()
     std::cout << g;
     */
 
-    // Bruker baseklasse-peker
     AbstractGraph* ag = new Graph();
 
     std::ifstream in("input.txt");
