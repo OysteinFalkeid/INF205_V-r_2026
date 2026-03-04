@@ -27,23 +27,48 @@ int main()
     std::cout << g;
     */
 
+    // Testing oppgave 3
+
+    std::cout << "Graph insidens liste \n";
+
     AbstractGraph* ag = new Graph();
 
-    std::ifstream in("input.txt");
+    std::ifstream in3("input.txt");
 
-    if (!in)
+    if (!in3)
     {
         std::cout << "Could not open input.txt\n";
         delete ag;
         return 1;
     }
 
-    ag->read(in);
+    ag->read(in3);
 
-    std::cout << "Graph content:\n";
     ag->write(std::cout);
 
     delete ag;
+
+    // Testing oppgave 4
+
+    std::cout << "Graph Matrix \n";
+
+    AbstractGraph* ag2 = new MatrixGraph();
+
+    std::ifstream in4("input.txt");
+
+    if (!in4)
+    {
+        std::cout << "Could not open input.txt\n";
+        delete ag;
+        delete ag2;
+        return 1;
+    }
+
+    ag2->read(in4);
+
+    ag2->write(std::cout);
+
+    delete ag2;
 
     return 0;
 }
