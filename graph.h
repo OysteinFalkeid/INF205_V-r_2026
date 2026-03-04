@@ -6,7 +6,7 @@
 #include <ostream>
 #include <istream>
 
-class Edge;   // forward declaration
+class Edge;  
 
 class AbstractGraph {
 public:
