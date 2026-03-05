@@ -22,6 +22,10 @@ public:
 
     virtual void read(std::istream& is) = 0;
     virtual void write(std::ostream& os) const = 0;
+
+    //Oppgave 5
+    virtual void disconnect(std::string node_a_label, std::string node_b_label) = 0;
+    virtual void remove_node(std::string node_label) = 0;
 };
 
 
@@ -82,6 +86,10 @@ public:
     
     void read(std::istream& is) override;
     void write(std::ostream& os) const override;
+
+    // Oppgave 5
+    void disconnect(std::string node_a_label, std::string node_b_label) override;
+    void remove_node(std::string node_label) override;
     
 };
 
@@ -104,7 +112,12 @@ class MatrixGraph : public AbstractGraph{
         void insert_edge(std::string node_a_label,
                      std::string edge_label,
                      std::string node_b_label) override;
+
         void read(std::istream& is) override;
         void write(std::ostream& os) const override;
+
+        // Oppgave 5
+        void disconnect(std::string node_a_label, std::string node_b_label) override;
+        void remove_node(std::string node_label) override;
 
 };
