@@ -228,3 +228,115 @@ void MatrixGraph::write(std::ostream& os) const
     }
 
 }
+
+// Oppgave 5
+
+void Graph::disconnect(std::string node_a_label, std::string node_b_label){
+
+    // Finner nodene a og b, returnerer hvis de ikke eksisterer
+
+    Node* a = find_node(node_a_label);
+    Node* b = find_node(node_b_label);
+
+    if (a == nullptr || b == nullptr){
+        return;
+    }
+
+    // Går gjennom alle edges i "edges". For hver edge, sjekke om den går fra node A til B
+
+    auto k = edges.begin();
+    while (k != edges.end()) // Kjør på så lenge vi ikke er på enden av vektoren
+    {
+        Edge* e = *k;
+        if (e->from == a && e->to == b)
+        {
+            //Fjerne kanten fra lista til node a, bruker remove siden vi har incidences i vektor
+            //std::remove sletter e, mens erase gir oss den vektoren som inneholder alt annet enn det vi fjernet. altså fjerner tomrommet
+            a->incidences.erase(
+                std::remove(a->incidences.begin(), a->incidences.end(), e), a->incidences.end()
+            );
+            //Fjerne kanten fra lista til node b
+            b->incidences.erase(
+                std::remove(b->incidences.begin(), b->incidences.end(), e), b->incidences.end()
+            );
+            //Slette kanten
+            delete e;
+            // Fjerne kanten fra edges
+            k = edges.erase(k); //slett kanten
+        } else{
+            ++k;
+        }
+    }
+
+    //Fjerne evt isolerte noder
+    auto in = nodes.begin(); //iterator som starter på det første elementet i nodes vektoren
+    while (in != nodes.end())
+    {
+        Node* n = *in;
+        if (n->incidences.empty()){ //returnerer true hvis den er isolert
+            delete n; //sletter node og frigjør minnet
+            in = nodes.erase(in); //fjerner noden fra vektoren
+        }else{
+            ++in; // hvis noden ikke er isolert så går den videre til neste node
+        }
+    }
+}
+
+void Graph::remove_node(std::string node_label){
+    //Finn noden, hvis den ikke finnes returner
+
+    Node* m = find_node(node_label);
+    if (m == nullptr){
+        return;
+    }
+
+    auto k = edges.begin();
+    while (k != edges.end()) // Kjør på så lenge vi ikke er på enden av vektoren
+    {
+        Edge* e = *k;
+        if (e->from == m || e->to == m)
+        {
+            //A - > e1 -> B, må fjerne edge fra A og fra B
+            //Fjerne edge fra "from"
+            e->from->incidences.erase(std::remove(e->from->incidences.begin(), e->from->incidences.end(), e), e->from->incidences.end());
+
+            //Fjerne edge fra "to"
+            e->to->incidences.erase(std::remove(e->to->incidences.begin(), e->to->incidences.end(), e), e->to->incidences.end());
+
+            //Slette kanten
+            delete e;
+            // Fjerne kanten fra edges
+            k = edges.erase(k); //slett kanten
+
+        }else{
+            ++k;
+        }
+    }
+
+    //Slett noden
+    nodes.erase(std::remove(nodes.begin(), nodes.end(), m), nodes.end()); //frigjør pekeren fra vektoren
+    delete m; // frigjør else node i minnet
+
+    //Fjerne evt isolerte noder
+    auto in = nodes.begin(); //iterator som starter på det første elementet i nodes vektoren
+    while (in != nodes.end())
+    {
+        Node* n = *in;
+        if (n->incidences.empty()){ //returnerer true hvis den er isolert
+            delete n; //sletter node og frigjør minnet
+            in = nodes.erase(in); //fjerner noden fra vektoren
+        }else{
+            ++in; // hvis noden ikke er isolert så går den videre til neste node
+        }
+    }
+}
+
+void MatrixGraph::disconnect(std::string node_a_label, std::string node_b_label)
+{
+
+}
+
+void MatrixGraph::remove_node(std::string node_label)
+{
+
+}
