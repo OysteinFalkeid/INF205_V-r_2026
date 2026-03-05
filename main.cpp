@@ -29,6 +29,7 @@ int main()
 
     // Testing oppgave 3
 
+    /*
     std::cout << "Graph insidens liste \n";
 
     AbstractGraph* ag = new Graph();
@@ -47,9 +48,10 @@ int main()
     ag->write(std::cout);
 
     delete ag;
+    */
 
     // Testing oppgave 4
-
+    /*
     std::cout << "Graph Matrix \n";
 
     AbstractGraph* ag2 = new MatrixGraph();
@@ -69,6 +71,29 @@ int main()
     ag2->write(std::cout);
 
     delete ag2;
+    */
+
+    // Testing oppgave 5
+
+    // Testing oppgave 5 - Graph
+    std::cout << "Test disconnect og remove_node (Graph)\n";
+
+    AbstractGraph* ag3 = new Graph();
+    std::ifstream in5("input.txt");
+    ag3->read(in5);
+
+    std::cout << "Før disconnect:\n";
+    ag3->write(std::cout);
+
+    ag3->disconnect("A", "B");
+    std::cout << "\nEtter disconnect(A, B):\n";
+    ag3->write(std::cout);
+
+    ag3->remove_node("A");
+    std::cout << "\nEtter remove_node(A):\n";
+    ag3->write(std::cout);
+
+    delete ag3;
 
     return 0;
 }
