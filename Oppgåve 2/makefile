@@ -3,9 +3,12 @@ CXXFLAGS = -Wall -Wextra -std=c++17
 
 BUILD_DIR = build
 
-TARGETS = problem-2-1 problem-2-2 problem-2-3 problem-2-4 problem-2-5 problem-2-6
+TARGETS = main 
 
 all: $(TARGETS)
+
+main: $(BUILD_DIR)/main.o
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp -o $@
 
 problem-2-1: $(BUILD_DIR)/problem-2-1.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
