@@ -23,6 +23,7 @@ class Node{
     std::list<Edge*> edges;
 
     void add_edge(std::string edge_label, Node* node_ptr);
+    void remove_edge(Node* node_ptr);
 };
 
 class Edge{
@@ -48,6 +49,7 @@ class Graph{
     
     void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label);
     void remove_node(std::string node_label);
+    void disconnect(std::string node_a_label, std::string node_b_label);
 };
 
 Node::Node(std::string node_label){
@@ -64,6 +66,36 @@ void Node::add_edge(std::string edge_label, Node* node_ptr){
     Edge* edge_ptr = new Edge(edge_label, node_ptr);
     edges.push_back(edge_ptr);
 }
+
+
+void Node::remove_edge(Node* node_ptr)
+{
+    // edges is a linked list
+    //assigning an iterator to read out values from the list
+    auto it = edges.begin();
+    // running a while loop over every element.
+    //this loop runs until the iterator has the value of the end ellement in the list
+    while (it != edges.end())
+    {
+        // extracting the pointer from the list using the iterator.
+        Edge* current_edge = *it;
+        
+        //testing if the edge is pointing to the specified node
+        if (current_edge->pointing_to_node == node_ptr)
+        {
+            // deleting the edge. The edge is responsible for cleanup in the node that is pointed to.
+            delete current_edge;
+            // deletes the element the iterator is pointing at. 
+            // if there are multiple pointers to the same edge this ensures only the specified element is deleted.
+            // this also increments the iterator to ensure the iterator points to a valid element in the list.
+            it = edges.erase(it);
+        } else {
+            //if the edge is not pointing to the node specified the iterator is incremented.
+            ++it;
+        }
+    }
+}
+
 
 Edge::Edge(std::string edge_label, Node* node_ptr){
     label = edge_label;
@@ -100,6 +132,12 @@ void Graph::insert_edge(std::string node_a_label, std::string edge_label, std::s
 void Graph::remove_node(std::string node_label){
     delete node_pointer_list[node_label];
     node_pointer_list.erase(node_label);
+}
+
+void Graph::disconnect(std::string node_a_label, std::string node_b_label){
+    if (node_pointer_list[node_a_label] && node_pointer_list[node_b_label]) {
+        node_pointer_list[node_a_label]->remove_edge(node_pointer_list[node_b_label]);
+    }
 }
 
 

@@ -1,0 +1,14 @@
+node_a_label edge_label node_b_label.
+node_a_label edge_label node_c_label.
+node_a_label edge_label node_d_label.
+node_b_label edge_label node_e_label.
+node_b_label edge_label node_f_label.
+node_c_label edge_label node_a_label.
+node_c_label edge_label node_b_label.
+node_c_label edge_label node_d_label.
+node_f_label edge_label node_a_label.
+node_f_label edge_label node_b_label.
+node_f_label edge_label node_c_label.
+node_f_label edge_label node_d_label.
+node_f_label edge_label node_e_label.
+

@@ -14,6 +14,10 @@ int main(int /*argc*/, char** /*argv*/)
     my_graph.insert_edge("node_b_label", "edge_label", "node_f_label");
 
     std::cout << my_graph << std::endl;
+
+    my_graph.disconnect("node_b_label", "node_c_label");
+
+    std::cout << my_graph << std::endl;
     
 
 }
