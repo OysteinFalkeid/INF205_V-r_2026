@@ -333,17 +333,40 @@ void Graph::remove_node(std::string node_label){
 
 void MatrixGraph::disconnect(std::string node_a_label, std::string node_b_label)
 {
+    int i = find_node(node_a_label);
+    int j = find_node(node_b_label);
 
+    if( i == -1 || j == -1){
+        return;
+    }
+    matrix[i][j].clear();
+
+    //Sjekke isolerte noder
+    
 }
 
 void MatrixGraph::remove_node(std::string node_label)
 {
+    int k = find_node(node_label);
+    if (k == -1){
+        return;
+    }
 
+    //Fjern rad
+    matrix.erase(matrix.begin() + k);
+    //fjern kolonne
+    for (auto&row : matrix){
+        row.erase(row.begin() + k);
+    }
+    //fjern node
+    nodes.erase(nodes.begin() + k);
+
+    //Sjekke isolerte noder
 }
 
 // Oppgave 6
 
-//Kopikonstruktør
+//Kopikonstruktør - lager helt nye node og edge objekter - deep copy
 Graph::Graph(const Graph& orig)
 {   
     //Går gjennom hver node i orginal grafen
