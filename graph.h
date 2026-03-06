@@ -90,7 +90,13 @@ public:
     // Oppgave 5
     void disconnect(std::string node_a_label, std::string node_b_label) override;
     void remove_node(std::string node_label) override;
-    
+
+    //Oppgave 6
+    Graph(const Graph& orig); //Kopikontruktør
+    Graph(){}
+    Graph& operator=(const Graph& rhs); //Kopioperator
+    Graph(Graph&& old); //Flyttekonstruktør
+    Graph& operator=(Graph&& old); //Flytteoperator
 };
 
 class MatrixGraph : public AbstractGraph{
@@ -106,7 +112,7 @@ class MatrixGraph : public AbstractGraph{
         //Legger til ny node og utvider matrisen. nå skal vi endre på matrisen og derfor er det ik const på slutten:
         void add_node(const std::string& label);
     public:
-        ~MatrixGraph();
+        ~MatrixGraph(); // destruktør
 
         void clear() override;
         void insert_edge(std::string node_a_label,

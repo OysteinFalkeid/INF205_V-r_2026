@@ -34,7 +34,7 @@ void Graph::insert_edge(std::string node_a_label,
                         std::string edge_label,
                         std::string node_b_label)
 {
-    Node* a = find_node(node_a_label);
+    Node* a = find_node(node_a_label); // Søker etter noden, hvis den ikke eksisterer opprettes det en node a
     if (!a)
     {
         a = new Node(node_a_label);
@@ -48,12 +48,12 @@ void Graph::insert_edge(std::string node_a_label,
         nodes.push_back(b);
     }
 
-    // Oppretter en ny kant og legger til i edges vektoren
+    // Oppretter en ny kant mellom a og b og legger til i edges vektoren
     Edge* e = new Edge(edge_label, a, b);
     edges.push_back(e);
 
-    a->incidences.push_back(e);
-    b->incidences.push_back(e);
+    a->incidences.push_back(e); // Kanten blir lagt til som den går fra node a
+    b->incidences.push_back(e); // Kanten blir lagt til som den går til node b
 }
 
 // Destruktør som går gjennom edges og sletter de før han går gjennom nodes og sletter de. Edge slettes før node
@@ -124,10 +124,10 @@ void Graph::read(std::istream& is)
 
     while (is >> a >> e >> b) // leser inn tre ord om gangen
     {
-        if (!b.empty() && b.back() == '.')
+        if (!b.empty() && b.back() == '.') //Den skal ikke lese inn punktumet
             b.pop_back();
 
-        insert_edge(a, e, b);
+        insert_edge(a, e, b); //Oppretter kanten i grafen
     }
 }
 
@@ -135,9 +135,9 @@ void Graph::write(std::ostream& os) const
 {
     for (auto e : edges) // går gjennom alle kanter og skriver de ut
     {
-        os << e->from->label << " "
-           << e->label << " "
-           << e->to->label << ".\n";
+        os << e->from->label << " " // henter labelen til fra noden
+           << e->label << " " // henter labelen til kanten
+           << e->to->label << ".\n"; // henter labelen til til noden
     }
 }
 
@@ -339,4 +339,85 @@ void MatrixGraph::disconnect(std::string node_a_label, std::string node_b_label)
 void MatrixGraph::remove_node(std::string node_label)
 {
 
+}
+
+// Oppgave 6
+
+//Kopikonstruktør
+Graph::Graph(const Graph& orig)
+{   
+    //Går gjennom hver node i orginal grafen
+    for (auto node : orig.nodes){ 
+        Node* ny_node = new Node(node->label); // Lager et nytt node objekt
+        nodes.push_back(ny_node); //legger pekeren til den nye noden inn i "this->nodes"
+    }
+    // Går gjennom hver kant
+    for (auto edge : orig.edges){
+        Node* new_from = find_node(edge->from->label);
+        Node* new_to = find_node(edge->to->label);
+        
+        // Lager en ny edge som peker på de nye nodene:
+        Edge* e = new Edge(edge->label, new_from, new_to);
+        // LEgge til i edges
+        edges.push_back(e);
+
+        //Oppdaterer incidences
+        new_from->incidences.push_back(e);
+        new_to->incidences.push_back(e);
+
+    }
+}
+
+//Kopioperator =
+Graph& Graph::operator=(const Graph& rhs){
+    if (this == &rhs){ //sjekk om to objekter ligger på samme adresse i minnet. hvis de er like så blir ikke clear kjørt.
+        return *this;
+    }
+    clear(); //rydder opp, kjører ikke hvis den ovenfor blir sann
+
+    //Går gjennom hver node i orginal grafen
+    for (auto node : rhs.nodes){ 
+        Node* ny_node = new Node(node->label); // Lager et nytt node objekt
+        nodes.push_back(ny_node); //legger pekeren til den nye noden inn i "this->nodes"
+    }
+    // Går gjennom hver kant
+    for (auto edge : rhs.edges){
+        Node* new_from = find_node(edge->from->label);
+        Node* new_to = find_node(edge->to->label);
+        
+        // Lager en ny edge som peker på de nye nodene:
+        Edge* e = new Edge(edge->label, new_from, new_to);
+        // LEgge til i edges
+        edges.push_back(e);
+
+        //Oppdaterer incidences
+        new_from->incidences.push_back(e);
+        new_to->incidences.push_back(e);
+
+    }
+
+    return *this;
+}
+
+//Flyttekonstruktøren
+
+Graph::Graph(Graph&& old){
+    //flytte noder og edges fra den gamle grafen til den nye
+    nodes = std::move(old.nodes);
+    edges = std::move(old.edges);
+}
+
+//Flytteoperatoren
+
+Graph& Graph::operator=(Graph&& old){
+    if (this == &old){ //sjekk om to objekter ligger på samme adresse i minnet. hvis de er like så blir ikke clear kjørt.
+        return *this;
+    }
+    clear(); //rydder opp, kjører ikke hvis den ovenfor blir sann
+
+    //flytte noder og edges fra den gamle grafen til den nye
+    nodes = std::move(old.nodes);
+    edges = std::move(old.edges);
+
+    return *this;
 }
