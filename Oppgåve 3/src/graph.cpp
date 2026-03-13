@@ -3,17 +3,42 @@
 namespace db{
 
 
-    Node_controller::Node_controller(/* args */){
+    Node_database_interface::~Node_database_interface(){
+        clear();
+    }
+
+    void Node_database_interface::clear(){
 
     }
 
-    Node_controller::Node_controller(std::string file_path){
+    void print(std::ostream& os){
+        os << "abstract class";
+    }
+
+    std::ostream& operator<<(std::ostream& os, const db::Node_database_interface& node_database_interface) {
+        node_database_interface.print(os);
+        return os;
+    }    
+    
+    // std::ostream& operator<<(std::ostream& os, const db::Node_database_interface* node_database_interface) {
+    //     node_database_interface->print(os);
+    //     return os;
+    // }
+
+    Node_database_interface::Node_database_interface(/* args */){
+
+    }
+
+    Node_database_interface::Node_database_interface(std::string file_path){
         std::cout << "virtual Method " << file_path;
     }
 
+    void Node_database_interface::print(std::ostream& os) const {
+        os << "This is an abstract class";
+    }
 
-    bool Node_controller::read_file(std::string file_path){
-        std::cout <<"1";
+
+    bool Node_database_interface::read_file(std::string file_path){
         std::ifstream file_inn(file_path);
         if (!file_inn){
             return false;
@@ -29,7 +54,7 @@ namespace db{
         return true;
     }
 
-    bool Node_controller::write_to_file(std::string file_path){
+    bool Node_database_interface::write_to_file(std::string file_path){
         std::ofstream file_out(file_path);
         if (!file_out){
             return false;
@@ -47,8 +72,19 @@ namespace db{
         label = node_label;
     }
 
-    Node::~Node(){
-        clear();
+    // Node::~Node(){
+    //     clear();
+    // }
+
+    
+    void Node::parse_buffer(){
+        
+    }
+
+    void Node::print(std::ostream& os) const{
+        for(auto& item : edges){
+            os << label << " " << *item;
+        }
     }
 
     void Node::clear(){
@@ -104,26 +140,48 @@ namespace db{
         pointing_to_node = node_ptr;
     }
 
-    Edge::~Edge(){
+    // Edge::~Edge(){
+    // }
+
+
+    
+    void Edge::parse_buffer(){
+        
     }
 
 
+    void Edge::print(std::ostream& os) const{
+        os << label << " ";
+        if(pointing_to_node){
+            os << pointing_to_node->label;
+        }
+        os  << "." << std::endl;
+    }
 
+    void Edge::clear() {
+
+    }
 
 
 
 
     // #### <Graph> ############################################################
 
-    Graph::~Graph(){
-        clear();
-    }
+    // Graph::~Graph(){
+    //     clear();
+    // }
 
-    Graph::Graph(const Graph& other): Node_controller(){
+    Graph::Graph(const Graph& other): Node_database_interface(){
         for (auto& pair : other.node_pointer_list){
             for (auto& item : pair.second->edges){
                 insert_edge(pair.second->label, item->label, item->pointing_to_node->label);
             }
+        }
+    }
+    
+    void Graph::print(std::ostream& os) const{
+        for(auto& pair : node_pointer_list){
+            os << *pair.second;
         }
     }
 
@@ -224,10 +282,8 @@ namespace db{
 
 
     void Graph::parse_buffer(){
-
         std::string line;
         while (std::getline(buffer, line)) {
-
             std::stringstream stringstream(line);
             std::string node_label_a;
             std::string edge_label;
@@ -241,39 +297,27 @@ namespace db{
         }
     }
 
-    bool Graph::read_file(std::string file_path){
-        std::ifstream file_inn(file_path);
-        if (!file_inn){
-            return false;
-        }
-
-        buffer.str("");
-        buffer.clear();
-        buffer << file_inn.rdbuf();
-        file_inn.close();
-
-        parse_buffer();
-
-        return true;
-    }
-
-    bool Graph::write_to_file(std::string file_path){
-        std::ofstream file_out(file_path);
-        if (!file_out){
-            return false;
-        }
-
-        file_out << *this << std::endl;
-        file_out.close();
-
-        return true;
-    }
-
 
     // #### <Matrix> ############################################################
 
-    Matrix::~Matrix(){
-        clear();
+    // Matrix::~Matrix(){
+    //     clear();
+    // }
+
+    void Matrix::print(std::ostream& os) const{
+        for (std::size_t i=0; i<nodes.size(); i++){
+            if (matrix.size() <= i){
+                break;
+            }
+            for (std::size_t j=0; j<nodes.size(); j++){
+                if (matrix[i].size() <= j) {
+                    break;
+                }
+                for (auto& string : matrix[i][j]){
+                    os << nodes[i] << " " << string << " " << nodes[j] << "." << std::endl;
+                }
+            }
+        }
     }
 
     void Matrix::parse_buffer(){
@@ -362,93 +406,4 @@ namespace db{
         }
     }
 
-    bool Matrix::read_file(std::string file_path){
-        std::ifstream file_inn(file_path);
-        if (!file_inn){
-            return false;
-        }
-
-        buffer.str("");
-        buffer.clear();
-        buffer << file_inn.rdbuf();
-        file_inn.close();
-
-        parse_buffer();
-
-        return true;
-    }
-
-    bool Matrix::write_to_file(std::string file_path){
-        std::ofstream file_out(file_path);
-        if (!file_out){
-            return false;
-        }
-
-        file_out << *this << std::endl;
-        file_out.close();
-
-        return true;
-    }
-
-
-}
-
-
-// #### <overloaders> ############################################################
-
-std::ostream& operator<<(std::ostream& os, const db::Node_controller& node_controller) {
-    os << &node_controller;
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const db::Graph& graph) {
-    for(auto& pair : graph.node_pointer_list){
-        os << pair.second;
-    }
-    return os;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const db::Matrix& matrix) {
-    for (std::size_t i=0; i<matrix.nodes.size(); i++){
-        if (matrix.matrix.size() <= i){
-            break;
-        }
-        for (std::size_t j=0; j<matrix.nodes.size(); j++){
-            if (matrix.matrix[i].size() <= j) {
-                break;
-            }
-            for (auto& string : matrix.matrix[i][j]){
-                os << matrix.nodes[i] << " " << string << " " << matrix.nodes[j] << "." << std::endl;
-            }
-        }
-    }
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const db::Node* node) {
-    if (node){
-        // os << node->label << ":" << std::endl;
-        for(auto& item : node->edges){
-            os << node->label << " " << item;
-        }
-    } else {
-        os << "nullptr";
-    }
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const db::Edge* edge) {
-    if (edge){
-        os << edge->label << " ";
-        if(edge->pointing_to_node){
-            os << edge->pointing_to_node->label;
-        } else {
-         os << "nullptr";
-        }
-    } else{
-        os << "nullptr";
-    }
-    os  << "." << std::endl;
-    return os;
 }

@@ -8,7 +8,7 @@ TARGETS = main
 all: $(TARGETS)
 
 main: $(BUILD_DIR)/main.o
-	$(CXX) $(CXXFLAGS) $^ src/graph.cpp -o $@
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
 
 $(BUILD_DIR)/%.o: src/%.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
