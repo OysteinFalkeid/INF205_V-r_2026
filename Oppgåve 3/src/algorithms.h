@@ -1,6 +1,10 @@
 #include "graph.h"
 #include <stack>
 #include <algorithm>
+#include <iostream>
+#include <utility> 
+
+#include <set>
 
 
 struct tarajans_control_structure{
@@ -32,8 +36,8 @@ struct rpq_control_structure{
 
     std::unordered_map<const db::Node*, bool> map_visited;
 
-    std::string return_string;
-    std::list<std::string> return_list;
+    db::Node* start_node;
+    std::list<std::pair<db::Node*, db::Node*>> return_list;
 };
 
 void DFS(const std::vector<db::Node *>& node_list, const db::Node* node_pointer, rpq_control_structure& controller);

@@ -96,30 +96,33 @@ void graphFileToDot(const std::string& inputFile, const std::string& dotFile) {
 }
 
 // sourced https://en.wikipedia.org/wiki/Depth-first_search 
-
-// procedure DFS(G, v) is
-//     label v as discovered
-//     for all directed edges from v to w that are in G.adjacentEdges(v) do
-//         if vertex w is not labeled as discovered then
-//             recursively call DFS(G, w)
-
-
 void DFS(const db::Node* node_pointer, rpq_control_structure& controller){
+    // setting node as visited to remove possibilities of searching in circles.
     controller.map_visited[node_pointer] = true;
+    // storing the index for this recursion in case of backtracking.
+    unsigned long column_index = controller.path_index_column;
+
     for (const auto& edge : node_pointer->edges){
-        if (controller.map_visited.find(node_pointer) != controller.map_visited.end()){
-            if (controller.paths[controller.path_index_row][controller.path_index_column] == edge->label){
-                controller.return_string += node_pointer->label;
-                controller.return_string += " ";
+        // overwriting index in case of backtracking
+        controller.path_index_column = column_index;
+        // is the nex node new in this serch?
+        if (controller.map_visited.find(edge->pointing_to_node) == controller.map_visited.end()){
+            // is the label of the edge corect?
+            if (controller.paths[controller.path_index_row][column_index] == edge->label){
+                // debugging
+                // std::cout << controller.paths[controller.path_index_row][0] << " " << controller.paths[controller.path_index_row][1] << " - " << edge->label << std::endl;
+                // std::cout << controller.start_node->label << " " << node_pointer->label << " " << edge->pointing_to_node->label << std::endl;
+                // ----
+                
+                //incrementing the index to the next edge label.
                 controller.path_index_column++;
-                if (controller.paths[controller.path_index_row].size() < controller.path_index_column){
-                    controller.path_index_row++;
+
+                // if the path is complete add the nodes to the list
+                if (controller.paths[controller.path_index_row].size() <= controller.path_index_column){
                     controller.path_index_column = 0;
-                    controller.return_list.push_back(controller.return_string);
-                    if (controller.paths.size() < controller.path_index_row){
-                        return;
-                    }
+                    controller.return_list.push_back({controller.start_node, edge->pointing_to_node});
                 }
+
                 DFS(edge->pointing_to_node, controller);
             }
         }
@@ -129,7 +132,6 @@ void DFS(const db::Node* node_pointer, rpq_control_structure& controller){
 // sourced https://en.wikipedia.org/wiki/Regular_path_query
 std::list<std::string> regular_path_querying(const db::Graph* const graph, std::string file_path){
 
-    std::cout << "test 1" << std::endl;
     rpq_control_structure controller;
 
     std::ifstream in_file(file_path);
@@ -138,6 +140,7 @@ std::list<std::string> regular_path_querying(const db::Graph* const graph, std::
 
     std::string line;
     std::string connection;
+    // reading from file
     while (std::getline(in_file, line)) {
         for (char c : line){
             if (c == '.'){
@@ -159,12 +162,48 @@ std::list<std::string> regular_path_querying(const db::Graph* const graph, std::
         connection += " ";
     }
 
-    controller.path_index_row = 0;
+    std::list<std::string> return_list;
+    std::list<std::pair<db::Node*, db::Node*>> nodes_found_a;
+    std::list<std::pair<db::Node*, db::Node*>> nodes_found_b;
 
-    for (const auto& node : node_list){
-        DFS(node, controller);
+    // making a list of all the first paths
+    for (const auto& node_ptr : node_list){
+        controller.path_index_column = 0;
+        controller.map_visited.clear();
+        controller.start_node = node_ptr;
+        DFS(node_ptr, controller);
+    }
+    nodes_found_a = controller.return_list;
+
+    // resetting and making a list of all the second paths
+    controller.path_index_row = 1;
+    controller.return_list.clear();
+    for (const auto& node_ptr : node_list){
+        controller.path_index_column = 0;
+        controller.map_visited.clear();
+        controller.start_node = node_ptr;
+        DFS(node_ptr, controller);
+    }
+    nodes_found_b = controller.return_list;
+    
+    std::list<std::pair<db::Node*, db::Node*>> intersection;
+
+    // comparing the list and finding diamonds
+    for (auto& pair_a : nodes_found_a){
+        for (auto& pair_b : nodes_found_b){
+            if ((pair_a.first == pair_b.first) && (pair_a.second == pair_b.second)){
+                intersection.push_back(pair_a);
+            }
+        }
+
     }
 
-    return controller.return_list;
+    // converting pointer to string labels
+    for (auto& pair : intersection){
+        return_list.push_back(pair.first->label + " " + pair.second->label);
+    }
+
+    
+    return return_list;
 }
 
