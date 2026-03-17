@@ -283,17 +283,21 @@ namespace db{
 
     void Graph::parse_buffer(){
         std::string line;
+        std::string connection;
         while (std::getline(buffer, line)) {
-            std::stringstream stringstream(line);
-            std::string node_label_a;
-            std::string edge_label;
-            std::string node_label_b;
-
-            stringstream >> node_label_a >> edge_label >> node_label_b;
-            node_label_b.pop_back();
-
-            insert_edge(node_label_a, edge_label, node_label_b);
-
+            for (char c : line){
+                if (c == '.'){
+                    std::stringstream stringstream(connection);
+                    connection.clear();
+                    std::string node_label_a, edge_label, node_label_b;
+                    stringstream >> node_label_a >> edge_label >> node_label_b;
+        
+                    insert_edge(node_label_a, edge_label, node_label_b);
+                } else {
+                    connection += c;
+                }
+            }
+            connection += " ";
         }
     }
 
