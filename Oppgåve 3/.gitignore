@@ -3,3 +3,6 @@ main
 build
 *.png
 *.dot
+problem*
+!*.cpp
+!*.h

@@ -3,11 +3,23 @@ CXXFLAGS = -Wall -Wextra -std=c++17
 
 BUILD_DIR = build
 
-TARGETS = main 
+TARGETS = main problem22_target problem25_target problem31_target problem32_target
 
 all: $(TARGETS)
 
 main: $(BUILD_DIR)/main.o
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
+
+problem22_target: $(BUILD_DIR)/problem22.o
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
+
+problem25_target: $(BUILD_DIR)/problem25.o
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
+
+problem31_target: $(BUILD_DIR)/problem31.o
+	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
+
+problem32_target: $(BUILD_DIR)/problem32.o
 	$(CXX) $(CXXFLAGS) $^ src/graph.cpp src/algorithms.cpp -o $@
 
 $(BUILD_DIR)/%.o: src/%.cpp | $(BUILD_DIR)
@@ -18,3 +30,16 @@ $(BUILD_DIR):
 
 clean:
 	rm -rf $(BUILD_DIR) $(TARGETS)
+
+
+problem22: problem22_target
+	./problem22_target -f graph_inn.txt
+
+problem25: problem25_target
+	./problem25_target -f graph_inn.txt
+
+problem31: problem31_target
+	./problem31_target -f scc-graph-benchmark-data/scc06.dat
+
+problem32: problem32_target
+	./problem32_target -f knowledge-graph-benchmark-data/kb04a.dat --rpq knowledge-graph-benchmark-data/qy04a.dat
