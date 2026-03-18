@@ -3,7 +3,8 @@ CXXFLAGS = -Wall -Wextra -std=c++17
 
 BUILD_DIR = build
 
-TARGETS = main problem22_target problem25_target problem31_target problem32_target
+TARGETS = main 
+# problem22_target problem25_target problem31_target problem32_target
 
 all: $(TARGETS)
 

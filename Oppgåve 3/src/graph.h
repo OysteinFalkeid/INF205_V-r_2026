@@ -11,6 +11,9 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <set>
+#include <utility> 
+
 
 namespace db{
     class Node;
@@ -42,30 +45,39 @@ namespace db{
     
         // void write(std::ofstream& out) const;
         friend std::ostream& operator<<(std::ostream& os, const Node_database_interface& node_database_interface);
-        // friend std::ostream& operator<<(std::ostream& os, const Node_database_interface* node_database_interface);
         
         virtual void clear();
+
+
+        virtual void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label) = 0;
+        virtual void remove_node(std::string node_label) = 0;
+        virtual void disconnect(std::string node_a_label, std::string node_b_label) = 0;
+        //returns a list of node labels
+        virtual std::list<std::string> get_nodes() = 0;
+        // returns a list of sets containing the edge label and node label the edge is pointing to
+        virtual std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) = 0;
+
+
         bool read_file(std::string file_path);
         bool write_to_file(std::string file_path);
 
     };
     
     
-    class Node : public Node_database_interface {
+    class Node {
         private:
-        
-        // std::stringstream buffer;
-        void parse_buffer() override;
-        void print(std::ostream& os) const override;
+        void print(std::ostream& os) const;
         
         public:
         
         Node(std::string node_label);
         
         // destructor
-        // ~Node();
+        ~Node();
         
-        void clear() override;
+        void clear();
+
+        friend std::ostream& operator<<(std::ostream& os, const Node& node);
         
         std::string label;
         std::list<Edge*> edges;
@@ -75,19 +87,19 @@ namespace db{
 
     };
     
-    class Edge : public Node_database_interface {
+    class Edge {
         private:
-
-        // std::stringstream buffer;
-        void parse_buffer() override;
-        void print(std::ostream& os) const override;
+        void print(std::ostream& os) const;
 
         public:
         
         Edge(std::string label, Node* node_ptr);
-        // ~Edge();
+        ~Edge();
         
-        void clear() override;
+        void clear();
+
+
+        friend std::ostream& operator<<(std::ostream& os, const Edge& edge);
 
         Node* pointing_to_node;
         std::string label;
@@ -122,9 +134,13 @@ namespace db{
         std::map<std::string, Node*> node_pointer_list;
         
         void clear() override;
-        void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label);
-        void remove_node(std::string node_label);
-        void disconnect(std::string node_a_label, std::string node_b_label);
+        void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label) override;
+        void remove_node(std::string node_label) override;
+        void disconnect(std::string node_a_label, std::string node_b_label) override;
+
+
+        std::list<std::string> get_nodes() override;
+        std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) override;
 
         std::vector<Node*> get_node_list() const{
                 std::vector<Node*> node_list;
@@ -134,9 +150,6 @@ namespace db{
                 }
                 return node_list;
         }
-        
-        // bool read_file(std::string file_path) override;
-        // bool write_to_file(std::string file_path) override;
 
         void cleanup();
         
@@ -162,12 +175,13 @@ namespace db{
         std::vector<std::vector<std::list<std::string>>> matrix;
         
         void clear() override;
-        void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label);
-        void remove_node(std::string node_label);
-        void disconnect(std::string node_a_label, std::string node_b_label);
+        void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label) override;
+        void remove_node(std::string node_label) override;
+        void disconnect(std::string node_a_label, std::string node_b_label) override;
+
+        // std::list<std::string> get_nodes() override;
+        // std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) override;
         
-        // bool read_file(std::string file_path) override;
-        // bool write_to_file(std::string file_path) override;
     };
     
     

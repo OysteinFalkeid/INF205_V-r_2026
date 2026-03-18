@@ -19,11 +19,6 @@ namespace db{
         node_database_interface.print(os);
         return os;
     }    
-    
-    // std::ostream& operator<<(std::ostream& os, const db::Node_database_interface* node_database_interface) {
-    //     node_database_interface->print(os);
-    //     return os;
-    // }
 
     Node_database_interface::Node_database_interface(/* args */){
 
@@ -72,14 +67,19 @@ namespace db{
         label = node_label;
     }
 
-    // Node::~Node(){
-    //     clear();
-    // }
+    Node::~Node(){
+        clear();
+    }
 
     
-    void Node::parse_buffer(){
+    // void Node::parse_buffer(){
         
-    }
+    // }
+    
+    std::ostream& operator<<(std::ostream& os, const db::Node& node) {
+        node.print(os);
+        return os;
+    }  
 
     void Node::print(std::ostream& os) const{
         for(auto& item : edges){
@@ -140,15 +140,20 @@ namespace db{
         pointing_to_node = node_ptr;
     }
 
-    // Edge::~Edge(){
-    // }
+    Edge::~Edge(){
+        clear();
+    }
 
 
     
-    void Edge::parse_buffer(){
+    // void Edge::parse_buffer(){
         
-    }
+    // }
 
+    std::ostream& operator<<(std::ostream& os, const db::Edge& edge) {
+        edge.print(os);
+        return os;
+    }  
 
     void Edge::print(std::ostream& os) const{
         os << label << " ";
@@ -302,6 +307,24 @@ namespace db{
     }
 
 
+    std::list<std::string> Graph::get_nodes(){
+        std::list<std::string> return_list;
+        for (auto& node : node_pointer_list){
+            return_list.push_back(node.first);
+        }
+        return return_list;
+    }
+    std::list<std::pair<std::string, std::string>> Graph::get_node_edges(std::string node_label){
+        std::list<std::pair<std::string, std::string>> return_list;
+        if (node_pointer_list.find(node_label) != node_pointer_list.end()){
+            for (auto& edge : node_pointer_list[node_label]->edges){
+                return_list.push_back({edge->label, edge->pointing_to_node->label});
+            }
+        }
+        return return_list;
+    }
+
+
     // #### <Matrix> ############################################################
 
     // Matrix::~Matrix(){
@@ -409,5 +432,13 @@ namespace db{
             }
         }
     }
+
+
+    // std::vector<std::string> Matrix::get_nodes(){
+
+    // }
+    // std::vector<std::set<std::string, std::string>> Matrix::get_node_edges(std::string node_label){
+
+    // }
 
 }

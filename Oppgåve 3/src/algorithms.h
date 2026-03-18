@@ -8,17 +8,19 @@
 
 
 struct tarajans_control_structure{
-    std::stack<const db::Node*> stack;
-    std::unordered_map<const db::Node*, int> map_index;
-    std::unordered_map<const db::Node*, int> map_lowlink;
-    std::unordered_map<const db::Node*, bool> map_on_stack;
+    db::Graph* graph;
+
+    std::stack<std::string> stack;
+    std::unordered_map<std::string, int> map_index;
+    std::unordered_map<std::string, int> map_lowlink;
+    std::unordered_map<std::string, bool> map_on_stack;
     int index = 0;
 
     std::list<std::string> return_list;
 };
 
-void strongconnect(const db::Node* const node_ptr, tarajans_control_structure& controller);
-std::list<std::string> tarjans_algorithm(const db::Graph* const graph);
+void strongconnect(std::string node_ptr, tarajans_control_structure& controller);
+std::list<std::string> tarjans_algorithm(db::Graph* graph);
 
 // claude generated code for converting .dat file to .dot file.
 // convert .dot file to png using "dot -Tpng graph.dot -o graph.png" in linux terminal.

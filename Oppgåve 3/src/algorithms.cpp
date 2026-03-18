@@ -4,34 +4,32 @@
 
 
 
-void strongconnect(const db::Node* const node_ptr, tarajans_control_structure& controller){
-    controller.map_index[node_ptr] = controller.index;
-    controller.map_lowlink[node_ptr] = controller.index;
+void strongconnect(std::string node, tarajans_control_structure& controller){
+    controller.map_index[node] = controller.index;
+    controller.map_lowlink[node] = controller.index;
     controller.index++;
-    controller.stack.push(node_ptr);
-    controller.map_on_stack[node_ptr] = true;
+    controller.stack.push(node);
+    controller.map_on_stack[node] = true;
 
-    for (const auto& edge : node_ptr->edges){
-        if (controller.map_index.find(edge->pointing_to_node) == controller.map_index.end()){
-            strongconnect(edge->pointing_to_node, controller);
-            controller.map_lowlink[node_ptr] = std::min(controller.map_lowlink[node_ptr], controller.map_lowlink [edge->pointing_to_node]);
-        } else if (controller.map_on_stack.find(edge->pointing_to_node) != controller.map_on_stack.end()){
-            if (controller.map_on_stack[edge->pointing_to_node]){
-                controller.map_lowlink[node_ptr] = std::min(controller.map_lowlink[node_ptr], controller.map_index[edge->pointing_to_node]);
-            }
+    for (const auto& edge : controller.graph->get_node_edges(node)){
+        if (controller.map_index.find(edge.second) == controller.map_index.end()){
+            strongconnect(edge.second, controller);
+            controller.map_lowlink[node] = std::min(controller.map_lowlink[node], controller.map_lowlink [edge.second]);
+        } else if (controller.map_on_stack[edge.second]){
+            controller.map_lowlink[node] = std::min(controller.map_lowlink[node], controller.map_index[edge.second]);
         }
     }
 
-    if (controller.map_lowlink[node_ptr] == controller.map_index[node_ptr]){
+    if (controller.map_lowlink[node] == controller.map_index[node]){
         std::string return_string;
         while(true){
-            const db::Node *node_ptr_in_stack = controller.stack.top();
+            std::string node_in_stack = controller.stack.top();
             controller.stack.pop();
-            controller.map_on_stack.erase(node_ptr_in_stack);
+            controller.map_on_stack[node_in_stack] = false;
 
-            return_string += node_ptr_in_stack->label + " ";
+            return_string += node_in_stack + " ";
 
-            if (node_ptr == node_ptr_in_stack){
+            if (node == node_in_stack){
                 break;
             }
         }
@@ -43,12 +41,13 @@ void strongconnect(const db::Node* const node_ptr, tarajans_control_structure& c
 
 //using pass by pointer with const to ensure the object is not changed.
 //this displays to the user that the graph is not copied but passed using pointer.
-std::list<std::string> tarjans_algorithm(const db::Graph* const graph){
+std::list<std::string> tarjans_algorithm( db::Graph* graph){
     tarajans_control_structure controller;
+    controller.graph = graph;
 
-    for (const auto& node_ptr : graph->get_node_list()){
-        if (controller.map_index.find(node_ptr) == controller.map_index.end()){
-            strongconnect(node_ptr, controller);
+    for (auto& node : graph->get_nodes()){
+        if (controller.map_index.find(node) == controller.map_index.end()){
+            strongconnect(node, controller);
         }
     }
 
