@@ -343,6 +343,28 @@ void MatrixGraph::disconnect(std::string node_a_label, std::string node_b_label)
     matrix[i][j].clear();
 
     //Sjekke isolerte noder
+    for (int k = 0; k < (int)nodes.size(); )
+    {
+        bool isolated = true;
+
+        for (int m = 0; m < (int)nodes.size(); m++)
+        {
+            if (!matrix[k][m].empty() || !matrix[m][k].empty())
+            {
+                isolated = false;
+                break;
+            }
+        }
+
+        if (isolated)
+        {
+            remove_node(nodes[k]); // rekursiv sletting
+        }
+        else
+        {
+            k++;
+        }
+    }
     
 }
 
@@ -363,6 +385,28 @@ void MatrixGraph::remove_node(std::string node_label)
     nodes.erase(nodes.begin() + k);
 
     //Sjekke isolerte noder
+    for (int i = 0; i < (int)nodes.size(); )
+    {
+        bool isolated = true;
+
+        for (int j = 0; j < (int)nodes.size(); j++)
+        {
+            if (!matrix[i][j].empty() || !matrix[j][i].empty())
+            {
+                isolated = false;
+                break;
+            }
+        }
+
+        if (isolated)
+        {
+            remove_node(nodes[i]); // rekursivt
+        }
+        else
+        {
+            i++;
+        }
+    }
 }
 
 // Oppgave 6
@@ -492,6 +536,42 @@ std::vector<std::string> MatrixGraph::get_neighbors(std::string label) const {
             result.push_back(nodes[j]);
         }
     }
+
+    return result;
+}
+
+//Oppgave 3-2
+
+std::vector<std::pair<std::string,std::string>>
+Graph::get_labeled_neighbors(std::string label) const
+{
+    std::vector<std::pair<std::string,std::string>> result;
+
+    Node* n = nullptr;
+    for (auto node : nodes)
+        if (node->label == label)
+            n = node;
+
+    if (!n) return result;
+
+    for (auto e : n->incidences)
+        if (e->from->label == label)
+            result.push_back({e->to->label, e->label});
+
+    return result;
+}
+
+std::vector<std::pair<std::string,std::string>>
+MatrixGraph::get_labeled_neighbors(std::string label) const
+{
+    std::vector<std::pair<std::string,std::string>> result;
+
+    int i = find_node(label);
+    if (i == -1) return result;
+
+    for (int j = 0; j < (int)nodes.size(); j++)
+        for (auto& edge_label : matrix[i][j])
+            result.push_back({nodes[j], edge_label});
 
     return result;
 }
