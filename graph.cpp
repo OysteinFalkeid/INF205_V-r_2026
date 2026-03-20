@@ -1,6 +1,7 @@
 #include "graph.h"
 #include <ostream>
 #include <iostream>
+#include <algorithm>
 
 // Node kontruktøren
 
@@ -443,4 +444,54 @@ Graph& Graph::operator=(Graph&& old){
     edges = std::move(old.edges);
 
     return *this;
+}
+
+//Oppgave 3-1
+std::vector<std::string> Graph::get_nodes() const {
+    std::vector<std::string> result;
+    for (auto n : nodes) {
+        result.push_back(n->label);
+    }
+    return result;
+}
+
+std::vector<std::string> Graph::get_neighbors(std::string label) const {
+    std::vector<std::string> result;
+
+    Node* n = nullptr;
+    for (auto node : nodes) {
+        if (node->label == label) {
+            n = node;
+            break;
+        }
+    }
+
+    if (!n) return result;
+
+    for (auto e : n->incidences) {
+        if (e->from->label == label) {
+            result.push_back(e->to->label);
+        }
+    }
+
+    return result;
+}
+
+std::vector<std::string> MatrixGraph::get_nodes() const {
+    return nodes;
+}
+
+std::vector<std::string> MatrixGraph::get_neighbors(std::string label) const {
+    std::vector<std::string> result;
+
+    int i = find_node(label);
+    if (i == -1) return result;
+
+    for (int j = 0; j < (int)nodes.size(); j++) {
+        if (!matrix[i][j].empty()) {
+            result.push_back(nodes[j]);
+        }
+    }
+
+    return result;
 }
