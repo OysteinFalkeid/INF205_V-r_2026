@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <list>
@@ -26,6 +27,11 @@ public:
     //Oppgave 5
     virtual void disconnect(std::string node_a_label, std::string node_b_label) = 0;
     virtual void remove_node(std::string node_label) = 0;
+
+    // Oppgave 3-1
+
+    virtual std::vector<std::string> get_nodes() const = 0;
+    virtual std::vector<std::string> get_neighbors(std::string node_label) const = 0;
 };
 
 
@@ -97,6 +103,12 @@ public:
     Graph& operator=(const Graph& rhs); //Kopioperator
     Graph(Graph&& old); //Flyttekonstruktør
     Graph& operator=(Graph&& old); //Flytteoperator
+
+    //Oppgave 3-1
+    std::vector<std::string> get_nodes() const override;
+    std::vector<std::string> get_neighbors(std::string node_label) const override;
+
+
 };
 
 class MatrixGraph : public AbstractGraph{
@@ -125,5 +137,8 @@ class MatrixGraph : public AbstractGraph{
         // Oppgave 5
         void disconnect(std::string node_a_label, std::string node_b_label) override;
         void remove_node(std::string node_label) override;
+
+        std::vector<std::string> get_nodes() const override;
+        std::vector<std::string> get_neighbors(std::string node_label) const override;
 
 };
