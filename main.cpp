@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+/*
 void testoppgave1(){
         std::cout << "Oppgave 1 - testing: \n";
         Graph g;
@@ -127,10 +128,12 @@ void testoppgave6(){
     g8.write(std::cout);
 
 }
-
+*/
 int main()
 {
-    // Test av oppgave 1:
+
+        /*
+// Test av oppgave 1:
 
     testoppgave1();
 
@@ -155,7 +158,103 @@ int main()
     
     testoppgave6();
 
+*/
 
+         /*
+    g.insert_edge("A","e1","B");
+    g.insert_edge("A","e2","C");
+
+    for (auto n : g.get_nodes()) {
+        std::cout << "Node: " << n << "\n";
+        for (auto nb : g.get_neighbors(n)) {
+            std::cout << "  -> " << nb << "\n";
+        }
+    }
+
+   
+
+    g.insert_edge("A","e1","B");
+    g.insert_edge("B","e2","C");
+    g.insert_edge("C","e3","A"); // cycle
+
+    g.insert_edge("D","e4","E");
+
+    auto sccs = tarjan_scc(&g);
+
+    for (auto& comp : sccs) {
+        std::cout << "SCC: ";
+        for (auto& node : comp) {
+            std::cout << node << " ";
+        }
+        std::cout << "\n";
+    }
+
+    */
+
+    // --- Standard verdiar ---
+    bool verbose    = true;
+    bool use_matrix = false;
+    std::string filename = "";
+ 
+    // --- Les flagg og filnamn frå kommandolinja ---
+    for (int i = 1; i < argc; i++)
+    {
+        std::string arg = argv[i];
+ 
+        if (arg == "--silent" || arg == "-s")
+            verbose = false;
+        else if (arg == "--verbose" || arg == "-v")
+            verbose = true;
+        else if (arg == "--matrix" || arg == "-m")
+            use_matrix = true;
+        else
+            filename = arg;   // første ukjente argument = grafil
+    }
+ 
+    // --- Validering ---
+    if (filename.empty())
+    {
+        std::cerr << "Bruk: " << argv[0]
+                  << " [--silent | --verbose] [--matrix] <grafil>\n";
+        return 1;
+    }
+ 
+    // --- Opne fil ---
+    std::ifstream in(filename);
+    if (!in)
+    {
+        std::cerr << "Kunne ikkje opne fil: " << filename << "\n";
+        return 1;
+    }
+ 
+    // --- Vel graftype via AbstractGraph-peikar ---
+    AbstractGraph* g = use_matrix
+                       ? static_cast<AbstractGraph*>(new MatrixGraph())
+                       : static_cast<AbstractGraph*>(new Graph());
+ 
+    if (verbose)
+        std::cout << "Graftype: " << (use_matrix ? "MatrixGraph" : "Graph") << "\n"
+                  << "Fil: " << filename << "\n\n";
+ 
+    // --- Les inn grafen ---
+    g->read(in);
+ 
+    // --- Køyr Tarjan ---
+    auto sccs = tarjan_scc(g);
+ 
+    // --- Skriv ut resultat ---
+    if (verbose)
+    {
+        for (auto& comp : sccs)
+        {
+            std::cout << "SCC: ";
+            for (auto& node : comp)
+                std::cout << node << " ";
+            std::cout << "\n";
+        }
+    }
+ 
+    std::cout << "Antall SCC: " << sccs.size() << "\n";
 
     return 0;
 }
