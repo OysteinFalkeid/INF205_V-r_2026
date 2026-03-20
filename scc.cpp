@@ -1,5 +1,7 @@
 #include "scc.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <unordered_map>
 #include <map>
 #include <set>
@@ -75,3 +77,61 @@ std::vector<std::vector<std::string>> tarjan_scc(AbstractGraph* graph)
 
     return state.result;
 }
+
+// Oppgave 3-2
+
+// DFS med label-filter
+std::set<std::string> reachable(
+    AbstractGraph* g,
+    const std::string& start,
+    const std::set<std::string>& allowed_labels)
+{
+    std::set<std::string> visited;
+    std::stack<std::string> st;
+
+    st.push(start);
+
+    while (!st.empty())
+    {
+        std::string v = st.top();
+        st.pop();
+
+        if (visited.count(v)) continue;
+        visited.insert(v);
+
+        for (auto [w, label] : g->get_labeled_neighbors(v))
+        {
+            if (allowed_labels.count(label))
+                st.push(w);
+        }
+    }
+
+    return visited;
+}
+
+
+std::vector<std::pair<std::string,std::string>>
+find_diamonds(
+    AbstractGraph* g,
+    const std::set<std::string>& even_labels,
+    const std::set<std::string>& odd_labels)
+{
+    std::vector<std::pair<std::string,std::string>> result;
+
+    for (auto ni : g->get_nodes())
+    {
+        auto R_even = reachable(g, ni, even_labels);
+        auto R_odd  = reachable(g, ni, odd_labels);
+
+        for (auto& nj : R_even)
+        {
+            if (nj != ni && R_odd.count(nj))
+            {
+                result.push_back({ni, nj});
+            }
+        }
+    }
+
+    return result;
+}
+
