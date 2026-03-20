@@ -1,6 +1,45 @@
 #include "graph.h"
+#include "scc.h"
+#include <set>
 #include <iostream>
+#include <sstream>
 #include <fstream>
+#include <string>
+
+void read_query(
+    const std::string& filename,
+    std::set<std::string>& even_labels,
+    std::set<std::string>& odd_labels)
+{
+    std::ifstream in(filename);
+    std::string line;
+
+    // første linje
+    if (std::getline(in, line))
+    {
+        std::istringstream iss(line);
+        std::string label;
+        while (iss >> label)
+        {
+            if (!label.empty() && label.back() == '.')
+                label.pop_back();
+            even_labels.insert(label);
+        }
+    }
+
+    // andre linje
+    if (std::getline(in, line))
+    {
+        std::istringstream iss(line);
+        std::string label;
+        while (iss >> label)
+        {
+            if (!label.empty() && label.back() == '.')
+                label.pop_back();
+            odd_labels.insert(label);
+        }
+    }
+}
 
 /*
 void testoppgave1(){
@@ -128,12 +167,12 @@ void testoppgave6(){
     g8.write(std::cout);
 
 }
-*/
-int main()
-{
+    */
 
-        /*
-// Test av oppgave 1:
+int main(int argc, char** argv)
+{
+     /*
+    // Test av oppgave 1:
 
     testoppgave1();
 
@@ -159,8 +198,9 @@ int main()
     testoppgave6();
 
 */
+    
 
-         /*
+    /*
     g.insert_edge("A","e1","B");
     g.insert_edge("A","e2","C");
 
@@ -191,58 +231,70 @@ int main()
 
     */
 
-    // --- Standard verdiar ---
+    // --- Standard ---
     bool verbose    = true;
     bool use_matrix = false;
-    std::string filename = "";
- 
-    // --- Les flagg og filnamn frå kommandolinja ---
+
+    // 🔥 NY struktur (oppgave 2)
+    std::string graphfile = "";
+    std::string queryfile = "";
+
+    // --- Argument parsing ---
     for (int i = 1; i < argc; i++)
     {
         std::string arg = argv[i];
- 
+
         if (arg == "--silent" || arg == "-s")
             verbose = false;
         else if (arg == "--verbose" || arg == "-v")
             verbose = true;
         else if (arg == "--matrix" || arg == "-m")
             use_matrix = true;
+        else if (graphfile.empty())
+            graphfile = arg;
         else
-            filename = arg;   // første ukjente argument = grafil
+            queryfile = arg;
     }
- 
+
     // --- Validering ---
-    if (filename.empty())
+    if (graphfile.empty())
     {
         std::cerr << "Bruk: " << argv[0]
-                  << " [--silent | --verbose] [--matrix] <grafil>\n";
+                  << " [--silent | --verbose] [--matrix] <grafil> [queryfil]\n";
         return 1;
     }
- 
-    // --- Opne fil ---
-    std::ifstream in(filename);
+
+    // --- Les graf ---
+    std::ifstream in(graphfile);
     if (!in)
     {
-        std::cerr << "Kunne ikkje opne fil: " << filename << "\n";
+        std::cerr << "Kunne ikkje opne graf-fil: " << graphfile << "\n";
         return 1;
     }
- 
-    // --- Vel graftype via AbstractGraph-peikar ---
+
+    // --- Vel graf ---
     AbstractGraph* g = use_matrix
-                       ? static_cast<AbstractGraph*>(new MatrixGraph())
-                       : static_cast<AbstractGraph*>(new Graph());
- 
+        ? static_cast<AbstractGraph*>(new MatrixGraph())
+        : static_cast<AbstractGraph*>(new Graph());
+
     if (verbose)
-        std::cout << "Graftype: " << (use_matrix ? "MatrixGraph" : "Graph") << "\n"
-                  << "Fil: " << filename << "\n\n";
- 
-    // --- Les inn grafen ---
+    {
+        std::cout << "Graftype: "
+                  << (use_matrix ? "MatrixGraph" : "Graph") << "\n";
+        std::cout << "Fil: " << graphfile << "\n\n";
+    }
+
     g->read(in);
- 
-    // --- Køyr Tarjan ---
+
+    // DEBUG: skriv ut grafen
+    g->write(std::cout);
+    std::cout << "\n";
+
+    // ======================
+    // SCC (oppgave 3.1)
+    // ======================
     auto sccs = tarjan_scc(g);
- 
-    // --- Skriv ut resultat ---
+
     if (verbose)
     {
         for (auto& comp : sccs)
@@ -253,8 +305,31 @@ int main()
             std::cout << "\n";
         }
     }
- 
+
     std::cout << "Antall SCC: " << sccs.size() << "\n";
 
+    // ======================
+    //Diamonds (oppgave 3.2)
+    // ======================
+    if (!queryfile.empty())
+    {
+        std::set<std::string> even_labels, odd_labels;
+
+        read_query(queryfile, even_labels, odd_labels);
+
+        auto diamonds = find_diamonds(g, even_labels, odd_labels);
+
+        if (verbose)
+        {
+            for (auto& [a, b] : diamonds)
+            {
+                std::cout << "Diamond: " << a << " -> " << b << "\n";
+            }
+        }
+
+        std::cout << "Antall diamonds: " << diamonds.size() << "\n";
+    }
+
+    delete g;
     return 0;
 }
