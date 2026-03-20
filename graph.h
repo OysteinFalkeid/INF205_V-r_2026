@@ -32,6 +32,11 @@ public:
 
     virtual std::vector<std::string> get_nodes() const = 0;
     virtual std::vector<std::string> get_neighbors(std::string node_label) const = 0;
+
+    // Oppgave 3-2
+
+    virtual std::vector<std::pair<std::string,std::string>>
+    get_labeled_neighbors(std::string node_label) const = 0;
 };
 
 
@@ -108,6 +113,10 @@ public:
     std::vector<std::string> get_nodes() const override;
     std::vector<std::string> get_neighbors(std::string node_label) const override;
 
+    //Oppgave 3-2
+    std::vector<std::pair<std::string,std::string>>
+    get_labeled_neighbors(std::string node_label) const override;
+
 
 };
 
@@ -138,7 +147,13 @@ class MatrixGraph : public AbstractGraph{
         void disconnect(std::string node_a_label, std::string node_b_label) override;
         void remove_node(std::string node_label) override;
 
+        // Oppgave 3-1
         std::vector<std::string> get_nodes() const override;
         std::vector<std::string> get_neighbors(std::string node_label) const override;
+
+        //Oppgave 3-2
+
+        std::vector<std::pair<std::string,std::string>>
+        get_labeled_neighbors(std::string node_label) const override;
 
 };
