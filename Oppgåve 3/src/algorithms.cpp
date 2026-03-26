@@ -10,14 +10,18 @@ void strongconnect(std::string node, tarajans_control_structure& controller){
     controller.index++;
     controller.stack.push(node);
     controller.map_on_stack[node] = true;
+    // std::cout << node << " at start: index " << controller.map_index[node] << " lowlink " << controller.map_lowlink[node] << std::endl; 
 
     for (const auto& edge : controller.graph->get_node_edges(node)){
         if (controller.map_index.find(edge.second) == controller.map_index.end()){
+            // std::cout << "recurtion" << std::endl;
             strongconnect(edge.second, controller);
             controller.map_lowlink[node] = std::min(controller.map_lowlink[node], controller.map_lowlink [edge.second]);
         } else if (controller.map_on_stack[edge.second]){
+            // std::cout << "found tail " << controller.map_on_stack[edge.second] << " " << edge.second << std::endl;
             controller.map_lowlink[node] = std::min(controller.map_lowlink[node], controller.map_index[edge.second]);
         }
+        // std::cout << node << " : index " << controller.map_index[node] << " lowlink " << controller.map_lowlink[node] << std::endl; 
     }
 
     if (controller.map_lowlink[node] == controller.map_index[node]){
@@ -26,6 +30,9 @@ void strongconnect(std::string node, tarajans_control_structure& controller){
             std::string node_in_stack = controller.stack.top();
             controller.stack.pop();
             controller.map_on_stack[node_in_stack] = false;
+
+
+            // std::cout << node_in_stack << " on stack : index " << controller.map_index[node_in_stack] << " lowlink " << controller.map_lowlink[node_in_stack] << " : " << node << std::endl; 
 
             return_string += node_in_stack + " ";
 
