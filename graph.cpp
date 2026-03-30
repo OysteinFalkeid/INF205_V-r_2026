@@ -2,6 +2,7 @@
 #include <ostream>
 #include <iostream>
 #include <algorithm>
+#include <set>
 
 // Node kontruktøren
 
@@ -20,13 +21,11 @@ Edge::Edge(const std::string& l, Node* f, Node* t)
 // Funksjon som går gjennom alle nodene i nodes-vektoren. Finner den riktig node returnerer den en peker til noden
 // Hvis ikke returnerer den nullptr
 
-Node* Graph::find_node(const std::string& label)
+Node* Graph::find_node(const std::string& label) const
 {
-    for (auto n : nodes)
-    {
-        if (n->label == label)
-            return n;
-    }
+    auto it = node_map.find(label);
+    if (it != node_map.end())
+        return it->second;
     return nullptr;
 }
 
@@ -39,14 +38,14 @@ void Graph::insert_edge(std::string node_a_label,
     if (!a)
     {
         a = new Node(node_a_label);
-        nodes.push_back(a);
+        node_map[node_a_label] = a;
     }
 
     Node* b = find_node(node_b_label);
     if (!b)
     {
         b = new Node(node_b_label);
-        nodes.push_back(b);
+        node_map[node_b_label] = b;
     }
 
     // Oppretter en ny kant mellom a og b og legger til i edges vektoren
@@ -63,8 +62,8 @@ Graph::~Graph()
     for (auto e : edges)
         delete e;
 
-    for (auto n : nodes)
-        delete n;
+    for (auto& [label, n] : node_map)
+    delete n;
 }
 
 // Tømmer grafen for edges og nodes men objektet graph eksisterer
@@ -73,11 +72,11 @@ void Graph::clear()
     for (auto e : edges)
         delete e;
 
-    for (auto n : nodes)
-        delete n;
+    for (auto& [label, n] : node_map)
+    delete n;
 
     edges.clear();
-    nodes.clear();
+    node_map.clear();
 }
 
 /* Oppgave 2 
@@ -165,8 +164,8 @@ void MatrixGraph::add_node(const std::string& label){
     }
 
     //Legg til en ny rad for den nye noden
-    int new_row = nodes.size() + 1;
-    matrix.push_back(std::vector<std::list<std::string>>(new_row));
+    int n = nodes.size();
+    matrix.push_back(std::vector<std::list<std::string>>(n + 1));
 
     // Legg til noden i lista
     nodes.push_back(label);
@@ -270,15 +269,18 @@ void Graph::disconnect(std::string node_a_label, std::string node_b_label){
     }
 
     //Fjerne evt isolerte noder
-    auto in = nodes.begin(); //iterator som starter på det første elementet i nodes vektoren
-    while (in != nodes.end())
+    for (auto it = node_map.begin(); it != node_map.end(); )
     {
-        Node* n = *in;
-        if (n->incidences.empty()){ //returnerer true hvis den er isolert
+        Node* n = it->second;
+
+        if (n->incidences.empty()) //returnerer true hvis den er isolert
+        {
             delete n; //sletter node og frigjør minnet
-            in = nodes.erase(in); //fjerner noden fra vektoren
-        }else{
-            ++in; // hvis noden ikke er isolert så går den videre til neste node
+            it = node_map.erase(it); //fjerner noden fra vektoren
+        }
+        else
+        {
+            ++it; // hvis noden ikke er isolert så går den videre til neste node
         }
     }
 }
@@ -315,19 +317,22 @@ void Graph::remove_node(std::string node_label){
     }
 
     //Slett noden
-    nodes.erase(std::remove(nodes.begin(), nodes.end(), m), nodes.end()); //frigjør pekeren fra vektoren
+    node_map.erase(node_label); //frigjør pekeren fra vektoren
     delete m; // frigjør else node i minnet
 
     //Fjerne evt isolerte noder
-    auto in = nodes.begin(); //iterator som starter på det første elementet i nodes vektoren
-    while (in != nodes.end())
+    for (auto it = node_map.begin(); it != node_map.end(); )
     {
-        Node* n = *in;
-        if (n->incidences.empty()){ //returnerer true hvis den er isolert
-            delete n; //sletter node og frigjør minnet
-            in = nodes.erase(in); //fjerner noden fra vektoren
-        }else{
-            ++in; // hvis noden ikke er isolert så går den videre til neste node
+        Node* n = it->second;
+
+        if (n->incidences.empty())
+        {
+            delete n;
+            it = node_map.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -415,9 +420,10 @@ void MatrixGraph::remove_node(std::string node_label)
 Graph::Graph(const Graph& orig)
 {   
     //Går gjennom hver node i orginal grafen
-    for (auto node : orig.nodes){ 
-        Node* ny_node = new Node(node->label); // Lager et nytt node objekt
-        nodes.push_back(ny_node); //legger pekeren til den nye noden inn i "this->nodes"
+    for (auto& [label, node] : orig.node_map)
+    {
+        Node* ny_node = new Node(label);
+        node_map[label] = ny_node;
     }
     // Går gjennom hver kant
     for (auto edge : orig.edges){
@@ -444,9 +450,10 @@ Graph& Graph::operator=(const Graph& rhs){
     clear(); //rydder opp, kjører ikke hvis den ovenfor blir sann
 
     //Går gjennom hver node i orginal grafen
-    for (auto node : rhs.nodes){ 
-        Node* ny_node = new Node(node->label); // Lager et nytt node objekt
-        nodes.push_back(ny_node); //legger pekeren til den nye noden inn i "this->nodes"
+    for (auto& [label, node] : rhs.node_map)
+    {
+        Node* ny_node = new Node(label);// Lager et nytt node objekt
+        node_map[label] = ny_node;  //legger pekeren til den nye noden inn i "this->nodes"
     }
     // Går gjennom hver kant
     for (auto edge : rhs.edges){
@@ -471,8 +478,11 @@ Graph& Graph::operator=(const Graph& rhs){
 
 Graph::Graph(Graph&& old){
     //flytte noder og edges fra den gamle grafen til den nye
-    nodes = std::move(old.nodes);
+    node_map = std::move(old.node_map);
     edges = std::move(old.edges);
+
+    old.node_map.clear();
+    old.edges.clear();
 }
 
 //Flytteoperatoren
@@ -484,41 +494,38 @@ Graph& Graph::operator=(Graph&& old){
     clear(); //rydder opp, kjører ikke hvis den ovenfor blir sann
 
     //flytte noder og edges fra den gamle grafen til den nye
-    nodes = std::move(old.nodes);
+    node_map = std::move(old.node_map);
     edges = std::move(old.edges);
+
+    // old må bli trygg til å destruere -> må tømme old
+    old.node_map.clear();
+    old.edges.clear();
 
     return *this;
 }
 
-//Oppgave 3-1
+//Oppgave 3.1
 std::vector<std::string> Graph::get_nodes() const {
     std::vector<std::string> result;
-    for (auto n : nodes) {
-        result.push_back(n->label);
+    for (auto& [label, n] : node_map) {
+        result.push_back(label);
     }
     return result;
 }
 
 std::vector<std::string> Graph::get_neighbors(std::string label) const {
-    std::vector<std::string> result;
+    std::set<std::string> unique;
 
-    Node* n = nullptr;
-    for (auto node : nodes) {
-        if (node->label == label) {
-            n = node;
-            break;
-        }
-    }
-
-    if (!n) return result;
+    Node* n = find_node(label);
+    if (!n) return {};
 
     for (auto e : n->incidences) {
         if (e->from->label == label) {
-            result.push_back(e->to->label);
+            unique.insert(e->to->label);
         }
     }
 
-    return result;
+    return std::vector<std::string>(unique.begin(), unique.end());
 }
 
 std::vector<std::string> MatrixGraph::get_nodes() const {
@@ -540,17 +547,14 @@ std::vector<std::string> MatrixGraph::get_neighbors(std::string label) const {
     return result;
 }
 
-//Oppgave 3-2
+//Oppgave 3.2
 
 std::vector<std::pair<std::string,std::string>>
 Graph::get_labeled_neighbors(std::string label) const
 {
     std::vector<std::pair<std::string,std::string>> result;
 
-    Node* n = nullptr;
-    for (auto node : nodes)
-        if (node->label == label)
-            n = node;
+    Node* n = find_node(label);
 
     if (!n) return result;
 
