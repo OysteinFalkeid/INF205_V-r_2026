@@ -4,9 +4,11 @@
 #include <list>
 #include <ostream>
 #include <istream>
+#include <unordered_map>
 
 class Edge;   // forward declaration av Edge. Edge finnes, men kommer etter Node. Node bruker edge
 
+//Et grensesnitt abstrakt klasse, som Graph og MatrixGraph arver fra
 class AbstractGraph {
 public:
     virtual ~AbstractGraph() {}   // virtuell destruktør
@@ -67,15 +69,16 @@ public:
     Edge(const std::string& l, Node* f, Node* t);
 };
 
+//peker basert graf
 class Graph : public AbstractGraph {
 private:
     //Liste over alle noder i grafen
-    std::vector<Node*> nodes;
+    std::unordered_map<std::string, Node*> node_map;
     //Liste over alle edges i grafen
     std::vector<Edge*> edges;
 
     //Hjelpefunksjon som skal søke gjennom nodes vektoren etter en node med bestemt navn ´label´
-    Node* find_node(const std::string& label);
+    Node* find_node(const std::string& label) const;
 
 public:
 
@@ -109,21 +112,23 @@ public:
     Graph(Graph&& old); //Flyttekonstruktør
     Graph& operator=(Graph&& old); //Flytteoperator
 
-    //Oppgave 3-1
+    //Oppgave 3.1
     std::vector<std::string> get_nodes() const override;
     std::vector<std::string> get_neighbors(std::string node_label) const override;
 
-    //Oppgave 3-2
+    //Oppgave 3.2
     std::vector<std::pair<std::string,std::string>>
     get_labeled_neighbors(std::string node_label) const override;
 
 
 };
 
+//matrise-basert
 class MatrixGraph : public AbstractGraph{
     private:
         //Hva noden kallen
         std::vector<std::string> nodes;
+        //adjancency matrix med edge labels
         //Matrise matrix[i][j] alle edges fra node i til node j
         std::vector<std::vector<std::list<std::string>>> matrix;
 
