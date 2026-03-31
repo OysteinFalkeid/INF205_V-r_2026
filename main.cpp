@@ -1,47 +1,14 @@
 #include "graph.h"
 #include "scc.h"
+#include "measure.h"
 #include <set>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
 
-void read_query(
-    const std::string& filename,
-    std::set<std::string>& even_labels,
-    std::set<std::string>& odd_labels)
-{
-    std::ifstream in(filename);
-    std::string line;
-
-    // første linje
-    if (std::getline(in, line))
-    {
-        std::istringstream iss(line);
-        std::string label;
-        while (iss >> label)
-        {
-            if (!label.empty() && label.back() == '.')
-                label.pop_back();
-            even_labels.insert(label);
-        }
-    }
-
-    // andre linje
-    if (std::getline(in, line))
-    {
-        std::istringstream iss(line);
-        std::string label;
-        while (iss >> label)
-        {
-            if (!label.empty() && label.back() == '.')
-                label.pop_back();
-            odd_labels.insert(label);
-        }
-    }
-}
-
 /*
+// Innlevering 2 - Oppgave 1 -> 6
 void testoppgave1(){
         std::cout << "Oppgave 1 - testing: \n";
         Graph g;
@@ -167,12 +134,269 @@ void testoppgave6(){
     g8.write(std::cout);
 
 }
-    */
+*/
+
+    //Innlevering 3
+    
+    //Oppgave 1
+
+    void test_scc() {
+    std::cout << "\nSCC test:\n";
+
+    Graph g;
+    std::ifstream in("scc02.dat");
+    g.read(in);
+
+    auto sccs = tarjan_scc(&g);
+
+    for (auto& comp : sccs) {
+        std::cout << "{ ";
+        for (auto& n : comp)
+            std::cout << n << " ";
+        std::cout << "}\n";
+    }
+}
+
+//Oppgave 3
+
+void demo_pro22()
+    {
+        std::cout << "Demo 2.2 (read/write):\n";
+
+        Graph g;
+        std::ifstream in("input.txt");
+
+        if (!in) {
+            std::cout << "Kunne ikke åpne input.txt\n";
+            return;
+        }
+
+        g.read(in);
+        g.write(std::cout);
+    }
+
+void demo_pro25(bool verbose, bool use_matrix)
+{
+    std::cout << "Demo 2.5 (disconnect/remove_node):\n";
+
+    AbstractGraph* g;
+
+    if (use_matrix)
+        g = new MatrixGraph();
+    else
+        g = new Graph();
+
+    g->insert_edge("A","e1","B");
+    g->insert_edge("A","e2","C");
+    g->insert_edge("B","e3","A");
+    g->insert_edge("B","e4","C");
+
+    std::cout << "Før:\n";
+    g->write(std::cout);
+
+    g->disconnect("A","B");
+
+    std::cout << "\nEtter disconnect(A,B):\n";
+    g->write(std::cout);
+
+    g->remove_node("A");
+
+    std::cout << "\nEtter remove_node(A):\n";
+    g->write(std::cout);
+
+    delete g;
+}
+
+void read_query(
+    std::istream& in,
+    std::vector<std::string>& even_labels,
+    std::vector<std::string>& odd_labels)
+{
+    even_labels.clear();
+    odd_labels.clear();
+
+    std::string line;
+
+    // første linje
+    if (std::getline(in, line))
+    {
+        std::istringstream iss(line);
+        std::string label;
+        while (iss >> label)
+        {
+            if (!label.empty() && label.back() == '.')
+                label.pop_back();
+            even_labels.push_back(label);
+        }
+    }
+
+    // andre linje
+    if (std::getline(in, line))
+    {
+        std::istringstream iss(line);
+        std::string label;
+        while (iss >> label)
+        {
+            if (!label.empty() && label.back() == '.')
+                label.pop_back();
+            odd_labels.push_back(label);
+        }
+    }
+}
+
+void demo_pro31(bool verbose, bool use_matrix, const std::string& filename)
+{
+    if (verbose)
+        std::cout << "Demo 3.1 (SCC):\n";
+
+    AbstractGraph* g;
+
+    if (use_matrix)
+        g = new MatrixGraph();
+    else
+        g = new Graph();
+
+    std::ifstream in(filename);
+    if (!in) {
+        std::cout << "Kunne ikke åpne " << filename << "\n";
+        delete g;
+        return;
+    }
+
+    g->read(in);
+
+    auto sccs = tarjan_scc(g);
+
+    for (auto& comp : sccs)
+    {
+        std::cout << "{ ";
+        for (auto& n : comp)
+            std::cout << n << " ";
+        std::cout << "}\n";
+    }
+
+    delete g;
+}
+
+void demo_pro32(bool verbose, bool use_matrix,
+                const std::string& graphfile,
+                const std::string& queryfile)
+{
+    if (verbose)
+        std::cout << "Demo 3.2 (Diamonds):\n";
+
+    AbstractGraph* g;
+
+    if (use_matrix)
+        g = new MatrixGraph();
+    else
+        g = new Graph();
+
+    std::ifstream gin(graphfile);
+    if (!gin) {
+        std::cout << "Kunne ikke åpne" << graphfile << "\n";
+        delete g;
+        return;
+    }
+
+    g->read(gin);
+
+    std::ifstream qin(queryfile);
+    if (!qin) {
+        std::cout << "Kunne ikke åpne " << queryfile << "\n";
+        delete g;
+        return;
+    }
+
+    std::vector<std::string> even_labels;
+    std::vector<std::string> odd_labels;
+
+    read_query(qin, even_labels, odd_labels);
+
+    auto diamonds = find_diamonds(g, even_labels, odd_labels);
+
+    for (auto& [a,b] : diamonds)
+    {
+        std::cout << "(" << a << ", " << b << ")\n";
+    }
+
+    delete g;
+}
 
 int main(int argc, char** argv)
+
 {
-     /*
-    // Test av oppgave 1:
+    bool verbose = true;
+    bool use_matrix = false;
+
+    for (int i = 1; i < argc; i++)
+    {
+        std::string arg = argv[i];
+
+        if (arg == "--silent" || arg == "-s")
+            verbose = false;
+        else if (arg == "--verbose" || arg == "-v")
+            verbose = true;
+        else if (arg == "--matrix" || arg == "-m")
+            use_matrix = true;
+    }
+
+    // Test av oppgave 3.4
+
+    if (argc >= 3 && std::string(argv[1]) == "--measure-scc")
+{
+    std::string graphfile = argv[2];
+
+    AbstractGraph* g = use_matrix
+        ? static_cast<AbstractGraph*>(new MatrixGraph())
+        : static_cast<AbstractGraph*>(new Graph());
+
+    std::ifstream in(graphfile);
+    if (!in)
+    {
+        std::cout << "Kunne ikkje opne " << graphfile << "\n";
+        return 1;
+    }
+
+    g->read(in);
+
+    measure_scc(g, 100);
+
+    delete g;
+    return 0;
+}
+
+if (argc >= 4 && std::string(argv[1]) == "--measure-diamonds")
+{
+    std::string graphfile = argv[2];
+    std::string queryfile = argv[3];
+
+    AbstractGraph* g = use_matrix
+        ? static_cast<AbstractGraph*>(new MatrixGraph())
+        : static_cast<AbstractGraph*>(new Graph());
+
+    std::ifstream in(graphfile);
+    if (!in)
+    {
+        std::cout << "Kunne ikke åpne " << graphfile << "\n";
+        return 1;
+    }
+
+    g->read(in);
+
+    std::ifstream qin(queryfile);
+    std::vector<std::string> even, odd;
+    read_query(qin, even, odd);
+
+    measure_diamonds(g, even, odd, 100);
+
+    delete g;
+    return 0;
+}
+
+
+    /*
+     // Test av oppgave 1:
 
     testoppgave1();
 
@@ -188,7 +412,6 @@ int main(int argc, char** argv)
     
     testoppgave4();
     
-    
     // Testing oppgave 5
 
     testoppgave5();
@@ -196,140 +419,50 @@ int main(int argc, char** argv)
     //Test av oppgave 6
     
     testoppgave6();
-
-*/
     
 
-    /*
-    g.insert_edge("A","e1","B");
-    g.insert_edge("A","e2","C");
+    // Innlevering 3
 
-    for (auto n : g.get_nodes()) {
-        std::cout << "Node: " << n << "\n";
-        for (auto nb : g.get_neighbors(n)) {
-            std::cout << "  -> " << nb << "\n";
-        }
-    }
-
-   
-
-    g.insert_edge("A","e1","B");
-    g.insert_edge("B","e2","C");
-    g.insert_edge("C","e3","A"); // cycle
-
-    g.insert_edge("D","e4","E");
-
-    auto sccs = tarjan_scc(&g);
-
-    for (auto& comp : sccs) {
-        std::cout << "SCC: ";
-        for (auto& node : comp) {
-            std::cout << node << " ";
-        }
-        std::cout << "\n";
-    }
-
+    // Test av oppgave 1
+    test_scc();
     */
 
-    // --- Standard ---
-    bool verbose    = true;
-    bool use_matrix = false;
-
-    // 🔥 NY struktur (oppgave 2)
-    std::string graphfile = "";
-    std::string queryfile = "";
-
-    // --- Argument parsing ---
-    for (int i = 1; i < argc; i++)
+    // Test av oppgave 3
+    if (argc < 2)
     {
-        std::string arg = argv[i];
-
-        if (arg == "--silent" || arg == "-s")
-            verbose = false;
-        else if (arg == "--verbose" || arg == "-v")
-            verbose = true;
-        else if (arg == "--matrix" || arg == "-m")
-            use_matrix = true;
-        else if (graphfile.empty())
-            graphfile = arg;
-        else
-            queryfile = arg;
-    }
-
-    // --- Validering ---
-    if (graphfile.empty())
-    {
-        std::cerr << "Bruk: " << argv[0]
-                  << " [--silent | --verbose] [--matrix] <grafil> [queryfil]\n";
+        std::cout << "Bruk:\n";
+        std::cout << "./main pro22\n";
+        std::cout << "./main pro25\n";
+        std::cout << "./main pro31\n";
+        std::cout << "./main pro32\n";
         return 1;
     }
 
-    // --- Les graf ---
-    std::ifstream in(graphfile);
-    if (!in)
-    {
-        std::cerr << "Kunne ikkje opne graf-fil: " << graphfile << "\n";
-        return 1;
-    }
+    std::string cmd = argv[1];
 
-    // --- Vel graf ---
-    AbstractGraph* g = use_matrix
-        ? static_cast<AbstractGraph*>(new MatrixGraph())
-        : static_cast<AbstractGraph*>(new Graph());
-
-    if (verbose)
-    {
-        std::cout << "Graftype: "
-                  << (use_matrix ? "MatrixGraph" : "Graph") << "\n";
-        std::cout << "Fil: " << graphfile << "\n\n";
-    }
-
-    g->read(in);
-
-    // DEBUG: skriv ut grafen
-    g->write(std::cout);
-    std::cout << "\n";
-
-    // ======================
-    // SCC (oppgave 3.1)
-    // ======================
-    auto sccs = tarjan_scc(g);
-
-    if (verbose)
-    {
-        for (auto& comp : sccs)
+    if (cmd == "pro22")
+        demo_pro22();
+    else if (cmd == "pro25")
+        demo_pro25(verbose, use_matrix);
+    else if (cmd == "pro31")
         {
-            std::cout << "SCC: ";
-            for (auto& node : comp)
-                std::cout << node << " ";
-            std::cout << "\n";
+        if (argc < 3) {
+            std::cout << "Bruk: pro31 <fil>\n";
+            return 1;
         }
-    }
-
-    std::cout << "Antall SCC: " << sccs.size() << "\n";
-
-    // ======================
-    //Diamonds (oppgave 3.2)
-    // ======================
-    if (!queryfile.empty())
-    {
-        std::set<std::string> even_labels, odd_labels;
-
-        read_query(queryfile, even_labels, odd_labels);
-
-        auto diamonds = find_diamonds(g, even_labels, odd_labels);
-
-        if (verbose)
+        demo_pro31(verbose, use_matrix, argv[2]);
+        }
+    else if (cmd == "pro32")
         {
-            for (auto& [a, b] : diamonds)
-            {
-                std::cout << "Diamond: " << a << " -> " << b << "\n";
-            }
+        if (argc < 4) {
+            std::cout << "Bruk: pro32 <graf> <query>\n";
+            return 1;
         }
-
-        std::cout << "Antall diamonds: " << diamonds.size() << "\n";
+        demo_pro32(verbose, use_matrix, argv[2], argv[3]);
     }
+    else
+        std::cout << "Ukjent kommando\n";
 
-    delete g;
+    
     return 0;
 }

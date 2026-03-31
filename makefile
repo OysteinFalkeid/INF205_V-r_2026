@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall
 
-SRC = main.cpp graph.cpp scc.cpp
+SRC = main.cpp graph.cpp scc.cpp measure.cpp
 OUT = program
 
 all: $(OUT)
@@ -9,21 +9,21 @@ all: $(OUT)
 $(OUT): $(SRC)
 	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT)
 
-# ======================
+
 # Demo (oppgave 3.3)
-# ======================
+
 
 pro22: $(OUT)
-	./$(OUT) kb03a.dat
+	./$(OUT) pro22
 
 pro25: $(OUT)
-	./$(OUT) kb03b.dat
+	./$(OUT) pro25
 
 pro31: $(OUT)
-	./$(OUT) kb03a.dat
+	./$(OUT) pro31
 
 pro32: $(OUT)
-	./$(OUT) kb03b.dat qy03b.dat
+	./$(OUT) pro32
 
 clean:
 	rm -f $(OUT)
