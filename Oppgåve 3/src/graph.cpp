@@ -348,18 +348,23 @@ namespace db{
     }
 
     void Matrix::parse_buffer(){
+
         std::string line;
+        std::string connection;
         while (std::getline(buffer, line)) {
-
-            std::stringstream stringstream(line);
-            std::string node_label_a;
-            std::string edge_label;
-            std::string node_label_b;
-
-            stringstream >> node_label_a >> edge_label >> node_label_b;
-            node_label_b.pop_back();
-
-            insert_edge(node_label_a, edge_label, node_label_b);
+            for (char c : line){
+                if (c == '.'){
+                    std::stringstream stringstream(connection);
+                    connection.clear();
+                    std::string node_label_a, edge_label, node_label_b;
+                    stringstream >> node_label_a >> edge_label >> node_label_b;
+        
+                    insert_edge(node_label_a, edge_label, node_label_b);
+                } else {
+                    connection += c;
+                }
+            }
+            connection += " ";
         }
     }
 
@@ -381,7 +386,7 @@ namespace db{
         if (std::find(nodes.begin(), nodes.end(), node_b_label) == nodes.end()) {
             nodes.push_back(node_b_label);
         }
-
+        
         for (std::size_t i=0; i<nodes.size(); i++){
 
             if (nodes[i] == node_a_label){
@@ -431,6 +436,34 @@ namespace db{
                 }
             }
         }
+    }
+
+
+    std::list<std::string> Matrix::get_nodes(){
+        std::list<std::string> return_list;
+        for (auto& node : nodes){
+            return_list.push_back(node);
+        }
+        return return_list;
+    }
+    std::list<std::pair<std::string, std::string>> Matrix::get_node_edges(std::string node_label){
+        std::list<std::pair<std::string, std::string>> return_list;
+
+        auto it = std::find(nodes.begin(), nodes.end(), node_label);
+
+        if (it != nodes.end()) {
+            // Calculate index using std::distance
+            int index = std::distance(nodes.begin(), it);
+            for (long unsigned int i = 0; i < matrix[index].size(); ++i) {
+                for (auto& edge : matrix[index][i]){
+                    return_list.push_back({edge, nodes[i]});
+                }
+            }
+            return return_list;
+        } else {
+            return return_list;
+        }
+
     }
 
 

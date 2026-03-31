@@ -48,7 +48,7 @@ void strongconnect(std::string node, tarajans_control_structure& controller){
 
 //using pass by pointer with const to ensure the object is not changed.
 //this displays to the user that the graph is not copied but passed using pointer.
-std::list<std::string> tarjans_algorithm( db::Graph* graph){
+std::list<std::string> tarjans_algorithm( db::Node_database_interface* graph){
     tarajans_control_structure controller;
     controller.graph = graph;
 
@@ -100,24 +100,23 @@ void graphFileToDot(const std::string& inputFile, const std::string& dotFile) {
 
     out << "}\n";
 }
-
 // sourced https://en.wikipedia.org/wiki/Depth-first_search 
-void DFS(const db::Node* node_pointer, rpq_control_structure& controller){
+void DFS(std::string node, rpq_control_structure& controller){
     // setting node as visited to remove possibilities of searching in circles.
-    controller.map_visited[node_pointer] = true;
+    controller.map_visited[node] = true;
     // storing the index for this recursion in case of backtracking.
     unsigned long column_index = controller.path_index_column;
 
-    for (const auto& edge : node_pointer->edges){
+    for (auto& edge : controller.graph->get_node_edges(node)){
         // overwriting index in case of backtracking
         controller.path_index_column = column_index;
         // is the nex node new in this serch?
-        if (controller.map_visited.find(edge->pointing_to_node) == controller.map_visited.end()){
+        if (controller.map_visited.find(edge.second) == controller.map_visited.end()){
             // is the label of the edge corect?
-            if (controller.paths[controller.path_index_row][column_index] == edge->label){
+            if (controller.paths[controller.path_index_row][column_index] == edge.first){
                 // debugging
                 // std::cout << controller.paths[controller.path_index_row][0] << " " << controller.paths[controller.path_index_row][1] << " - " << edge->label << std::endl;
-                // std::cout << controller.start_node->label << " " << node_pointer->label << " " << edge->pointing_to_node->label << std::endl;
+                // std::cout << controller.start_node->label << " " << node->label << " " << edge->pointing_to_node->label << std::endl;
                 // ----
                 
                 //incrementing the index to the next edge label.
@@ -126,23 +125,23 @@ void DFS(const db::Node* node_pointer, rpq_control_structure& controller){
                 // if the path is complete add the nodes to the list
                 if (controller.paths[controller.path_index_row].size() <= controller.path_index_column){
                     controller.path_index_column = 0;
-                    controller.return_list.push_back({controller.start_node, edge->pointing_to_node});
+                    controller.return_list.push_back({controller.start_node, edge.second});
                 }
 
-                DFS(edge->pointing_to_node, controller);
+                DFS(edge.second, controller);
             }
         }
     }
 }
 
 // sourced https://en.wikipedia.org/wiki/Regular_path_query
-std::list<std::string> regular_path_querying(const db::Graph* const graph, std::string file_path){
-
+std::list<std::string> regular_path_querying(db::Node_database_interface* graph, std::string file_path){
     rpq_control_structure controller;
 
-    std::ifstream in_file(file_path);
-    std::vector<db::Node *> node_list = graph->get_node_list();
+    controller.graph = graph;
 
+    std::ifstream in_file(file_path);
+    std::list<std::string> node_list = graph->get_nodes();
 
     std::string line;
     std::string connection;
@@ -169,15 +168,15 @@ std::list<std::string> regular_path_querying(const db::Graph* const graph, std::
     }
 
     std::list<std::string> return_list;
-    std::list<std::pair<db::Node*, db::Node*>> nodes_found_a;
-    std::list<std::pair<db::Node*, db::Node*>> nodes_found_b;
+    std::list<std::pair<std::string, std::string>> nodes_found_a;
+    std::list<std::pair<std::string, std::string>> nodes_found_b;
 
     // making a list of all the first paths
-    for (const auto& node_ptr : node_list){
+    for (const auto& node : node_list){
         controller.path_index_column = 0;
         controller.map_visited.clear();
-        controller.start_node = node_ptr;
-        DFS(node_ptr, controller);
+        controller.start_node = node;
+        DFS(node, controller);
     }
     nodes_found_a = controller.return_list;
 
@@ -192,7 +191,7 @@ std::list<std::string> regular_path_querying(const db::Graph* const graph, std::
     }
     nodes_found_b = controller.return_list;
     
-    std::list<std::pair<db::Node*, db::Node*>> intersection;
+    std::list<std::pair<std::string, std::string>> intersection;
 
     // comparing the list and finding diamonds
     for (auto& pair_a : nodes_found_a){
@@ -206,7 +205,7 @@ std::list<std::string> regular_path_querying(const db::Graph* const graph, std::
 
     // converting pointer to string labels
     for (auto& pair : intersection){
-        return_list.push_back(pair.first->label + " " + pair.second->label);
+        return_list.push_back(pair.first + " " + pair.second);
     }
 
     

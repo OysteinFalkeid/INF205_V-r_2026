@@ -8,7 +8,7 @@
 
 
 struct tarajans_control_structure{
-    db::Graph* graph;
+    db::Node_database_interface* graph;
 
     std::stack<std::string> stack;
     std::unordered_map<std::string, int> map_index;
@@ -20,7 +20,7 @@ struct tarajans_control_structure{
 };
 
 void strongconnect(std::string node_ptr, tarajans_control_structure& controller);
-std::list<std::string> tarjans_algorithm(db::Graph* graph);
+std::list<std::string> tarjans_algorithm(db::Node_database_interface* graph);
 
 // claude generated code for converting .dat file to .dot file.
 // convert .dot file to png using "dot -Tpng graph.dot -o graph.png" in linux terminal.
@@ -28,6 +28,7 @@ void graphFileToDot(const std::string& inputFile, const std::string& dotFile);
 
 
 struct rpq_control_structure{
+    db::Node_database_interface* graph;
     // only tow paths but i used a matrix because i was lazy.
     // this cold be changed later to tow separate vectors or a different more optimal type.
     std::vector<std::vector<std::string>> paths;
@@ -36,12 +37,12 @@ struct rpq_control_structure{
     long unsigned int path_index_column = 0;
 
 
-    std::unordered_map<const db::Node*, bool> map_visited;
+    std::unordered_map<std::string, bool> map_visited;
 
-    db::Node* start_node;
-    std::list<std::pair<db::Node*, db::Node*>> return_list;
+    std::string start_node;
+    std::list<std::pair<std::string, std::string>> return_list;
 };
 
-void DFS(const std::vector<db::Node *>& node_list, const db::Node* node_pointer, rpq_control_structure& controller);
+void DFS(std::string node, rpq_control_structure& controller);
 
-std::list<std::string> regular_path_querying(const db::Graph* const graph, std::string file_path);
+std::list<std::string> regular_path_querying(db::Node_database_interface* graph, std::string file_path);
