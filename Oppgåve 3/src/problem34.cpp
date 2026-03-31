@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     CLI11_PARSE(app, argc, argv);
 
 
-    Matrix graph;
+    Graph graph;
     
     graph.read_file(file);
 
@@ -47,7 +47,9 @@ int main(int argc, char** argv)
 
                 start = std::chrono::high_resolution_clock::now();
                 
-                regular_path_querying(&graph, file_regular_path_querying);
+                std::__cxx11::list<std::string> my_list = regular_path_querying(&graph, file_regular_path_querying);
+
+                // std::cout << "paries found: " << my_list.size() << std::endl;
                 
             
                 end = std::chrono::high_resolution_clock::now();
