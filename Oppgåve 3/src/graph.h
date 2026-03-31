@@ -43,7 +43,6 @@ namespace db{
         virtual ~Node_database_interface();
 
     
-        // void write(std::ofstream& out) const;
         friend std::ostream& operator<<(std::ostream& os, const Node_database_interface& node_database_interface);
         
         virtual void clear();
@@ -52,11 +51,12 @@ namespace db{
         virtual void insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label) = 0;
         virtual void remove_node(std::string node_label) = 0;
         virtual void disconnect(std::string node_a_label, std::string node_b_label) = 0;
+
         //returns a list of node labels
         virtual std::list<std::string> get_nodes() = 0;
+
         // returns a list of sets containing the edge label and node label the edge is pointing to
         virtual std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) = 0;
-
 
         bool read_file(std::string file_path);
         bool write_to_file(std::string file_path);
@@ -142,15 +142,6 @@ namespace db{
         std::list<std::string> get_nodes() override;
         std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) override;
 
-        std::vector<Node*> get_node_list() const{
-                std::vector<Node*> node_list;
-                node_list.reserve(node_pointer_list.size());
-                for (const auto& pair : node_pointer_list) {
-                    node_list.push_back(pair.second);
-                }
-                return node_list;
-        }
-
         void cleanup();
         
     };
@@ -181,18 +172,6 @@ namespace db{
 
         std::list<std::string> get_nodes() override;
         std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) override;
-
-        // std::vector<Node*> get_node_list() const{
-        //         std::vector<Node*> node_list;
-        //         node_list.reserve(node_pointer_list.size());
-        //         for (const auto& pair : node_pointer_list) {
-        //             node_list.push_back(pair.second);
-        //         }
-        //         return node_list;
-        // }
-
-        // std::list<std::string> get_nodes() override;
-        // std::list<std::pair<std::string, std::string>> get_node_edges(std::string node_label) override;
         
     };
     

@@ -6,3 +6,4 @@ build
 problem*
 !*.cpp
 !*.h
+graph_benchmark

@@ -55,8 +55,10 @@ int main(int argc, char** argv)
 
     if (file_regular_path_querying != ""){
         std::list<std::string> list_of_string = regular_path_querying(&graph, file_regular_path_querying);
-        for (auto& string : list_of_string){
-            std::cout << string << std::endl;
+        if (verbose){
+            for (auto& string : list_of_string){
+                std::cout << string << std::endl;
+            }
         }
     }
 

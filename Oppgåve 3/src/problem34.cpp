@@ -22,12 +22,9 @@ int main(int argc, char** argv)
     int rounds = 10;
     app.add_option("-r, --rounds", rounds, "number of repetitions for generating average time");
 
-
     CLI11_PARSE(app, argc, argv);
 
-
     Graph graph;
-    
     graph.read_file(file);
 
     std::chrono::_V2::system_clock::time_point start;
@@ -35,23 +32,14 @@ int main(int argc, char** argv)
     double total = 0.0;
 
     for (int i = 0; i < rounds; i++) {
-        
         if (use_tarjans_algorithm) {
             start = std::chrono::high_resolution_clock::now();
-        
             tarjans_algorithm(&graph);
-        
             end = std::chrono::high_resolution_clock::now();
         } else {
             if (file_regular_path_querying != "") {
-
                 start = std::chrono::high_resolution_clock::now();
-                
                 std::__cxx11::list<std::string> my_list = regular_path_querying(&graph, file_regular_path_querying);
-
-                // std::cout << "paries found: " << my_list.size() << std::endl;
-                
-            
                 end = std::chrono::high_resolution_clock::now();
             }
 
@@ -59,9 +47,6 @@ int main(int argc, char** argv)
 
         std::chrono::duration<double, std::milli> elapsed = end - start;
         total += elapsed.count();
-        // if (verbose) {
-        //     std::cout << "Round " << i + 1 << ": " << elapsed.count() << " ms\n";
-        // }
     }
 
     if (verbose){
