@@ -18,18 +18,22 @@ Edge::Edge(const std::string& l, Node* f, Node* t)
 {
 }
 
-// Funksjon som går gjennom alle nodene i nodes-vektoren. Finner den riktig node returnerer den en peker til noden
+// Funksjon som går gjennom alle nodene i nodes-mapen. Finner den riktig node returnerer den en peker til noden
 // Hvis ikke returnerer den nullptr
+
+//unordered_map : first er nøkkelen, labelen
+//second er verdien, pekeren til noden
 
 Node* Graph::find_node(const std::string& label) const
 {
     auto it = node_map.find(label);
     if (it != node_map.end())
+        //returnerer pekeren til noden vi ser etter.
         return it->second;
     return nullptr;
 }
 
-// Finner node A og B som opprettes hvis ikke de finnes og blir lagt til i nodes vektoren
+// Finner node A og B som opprettes hvis ikke de finnes og blir lagt til i nodes mapen
 void Graph::insert_edge(std::string node_a_label,
                         std::string edge_label,
                         std::string node_b_label)
@@ -59,6 +63,8 @@ void Graph::insert_edge(std::string node_a_label,
 // Destruktør som går gjennom edges og sletter de før han går gjennom nodes og sletter de. Edge slettes før node
 Graph::~Graph()
 {
+    // må slette edges først fordi de inneholder pekere til node objekter. 
+    //unngå dangling pointers
     for (auto e : edges)
         delete e;
 
@@ -159,6 +165,8 @@ int MatrixGraph::find_node(const std::string& label) const{
 
 void MatrixGraph::add_node(const std::string& label){
     //Legg til en ny kolonne i alle eksisterende rader
+    //hvis man legger til en ny rad uten å utvide kolonnene ville man ha fått
+    //en nxm matrise og ikke en nxn matris
     for (auto&row : matrix){
         row.push_back(std::list<std::string>());
     }
@@ -172,6 +180,9 @@ void MatrixGraph::add_node(const std::string& label){
 }
 
 void MatrixGraph::insert_edge(std::string node_a_label, std::string edge_label, std::string node_b_label){
+
+    //add_node kan endre indeksene. derfor brukes find_node igjen etter
+    //add_node
 
     //Finn eller opprett node A
     if(find_node(node_a_label) == -1)
@@ -296,6 +307,9 @@ void Graph::remove_node(std::string node_label){
     auto k = edges.begin();
     while (k != edges.end()) // Kjør på så lenge vi ikke er på enden av vektoren
     {
+        // siden incidences på begge nodene inneholder pekere til den samme kanten, 
+        // må du rydde opp begge steder før du sletter kanten med delete e. 
+        // Ellers sitter den andre noden igjen med en peker til minne som ikke lenger er gyldig
         Edge* e = *k;
         if (e->from == m || e->to == m)
         {
@@ -417,6 +431,7 @@ void MatrixGraph::remove_node(std::string node_label)
 // Oppgave 6
 
 //Kopikonstruktør - lager helt nye node og edge objekter - deep copy
+//deep copy lager nye objekter
 Graph::Graph(const Graph& orig)
 {   
     //Går gjennom hver node i orginal grafen
@@ -505,22 +520,29 @@ Graph& Graph::operator=(Graph&& old){
 }
 
 //Oppgave 3.1
+
+// Vil ha alle noder i grafen
 std::vector<std::string> Graph::get_nodes() const {
+    //Samler alle nodene her
     std::vector<std::string> result;
+x
     for (auto& [label, n] : node_map) {
         result.push_back(label);
     }
+    // Returnerer liste med nodene
     return result;
 }
 
 std::vector<std::string> Graph::get_neighbors(std::string label) const {
     std::set<std::string> unique;
-
+    //finner node
     Node* n = find_node(label);
     if (!n) return {};
-
+    //går gjennom alle kanter koblet til noden
     for (auto e : n->incidences) {
+        //bare utgående noder
         if (e->from->label == label) {
+            //legger til nabo
             unique.insert(e->to->label);
         }
     }
@@ -553,18 +575,21 @@ std::vector<std::pair<std::string,std::string>>
 Graph::get_labeled_neighbors(std::string label) const
 {
     std::vector<std::pair<std::string,std::string>> result;
-
+    //finn node
     Node* n = find_node(label);
 
     if (!n) return result;
 
+    //gå gjennom alle kanter koblet til noden
     for (auto e : n->incidences)
+        //bare utgående kanter
         if (e->from->label == label)
             result.push_back({e->to->label, e->label});
 
     return result;
 }
 
+//hvor kan jeg gå og med hvilken label?
 std::vector<std::pair<std::string,std::string>>
 MatrixGraph::get_labeled_neighbors(std::string label) const
 {
@@ -572,8 +597,9 @@ MatrixGraph::get_labeled_neighbors(std::string label) const
 
     int i = find_node(label);
     if (i == -1) return result;
-
+    //går gjennom alle mulige naboer
     for (int j = 0; j < (int)nodes.size(); j++)
+        // en celle kan ha flere labels
         for (auto& edge_label : matrix[i][j])
             result.push_back({nodes[j], edge_label});
 
