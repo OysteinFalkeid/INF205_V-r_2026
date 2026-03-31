@@ -30,12 +30,12 @@ public:
     virtual void disconnect(std::string node_a_label, std::string node_b_label) = 0;
     virtual void remove_node(std::string node_label) = 0;
 
-    // Oppgave 3-1
+    // Oppgave 3.1
 
     virtual std::vector<std::string> get_nodes() const = 0;
     virtual std::vector<std::string> get_neighbors(std::string node_label) const = 0;
 
-    // Oppgave 3-2
+    // Oppgave 3.2
 
     virtual std::vector<std::pair<std::string,std::string>>
     get_labeled_neighbors(std::string node_label) const = 0;
@@ -47,7 +47,8 @@ public:
 
     //unike identifikatoren til noden
     std::string label;
-    //alle edges denne noden er incident til
+    //alle edges denne noden er incident til. 
+    //kanter som går ut fra noden og som går inn til node
     std::vector<Edge*> incidences;
 
     //Konstruktøren 
@@ -77,7 +78,7 @@ private:
     //Liste over alle edges i grafen
     std::vector<Edge*> edges;
 
-    //Hjelpefunksjon som skal søke gjennom nodes vektoren etter en node med bestemt navn ´label´
+    //Hjelpefunksjon som skal søke gjennom nodes mapen etter en node med bestemt navn ´label´
     Node* find_node(const std::string& label) const;
 
 public:
